@@ -1,0 +1,19 @@
+---
+interface Props {
+  name: string;
+  class?: string;
+}
+
+const {
+  name,
+  class: className
+} = Astro.props;
+---
+
+<div
+  data-slot="radio-group"
+  class:list={['grid gap-3', className]}
+  role="radiogroup"
+>
+  <slot />
+</div>

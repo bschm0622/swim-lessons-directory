@@ -1,0 +1,172 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Badge from "@/components/ui/Badge.astro";
+import Button from "@/components/ui/Button.astro";
+import Section from "@/components/ui/Section.astro";
+---
+
+<Layout title="Home" description="Home Page">
+	<div
+		class="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
+	>
+		<!-- Content -->
+		<Section
+			container={false}
+			class="text-center"
+		>
+			<!-- Badge -->
+			<div class="flex justify-center mb-6">
+				<Badge variant="outline" class="gap-2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+						<path d="M2 17l10 5 10-5"></path>
+						<path d="M2 12l10 5 10-5"></path>
+					</svg>
+					Astro Components
+				</Badge>
+			</div>
+
+			<!-- Heading with gradient -->
+			<h1 class="text-5xl md:text-7xl font-bold mb-6 text-primary">
+				Build faster with<br />beautiful components
+			</h1>
+
+			<!-- Description -->
+			<p class="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+				Beautifully designed components built with Astro and Tailwind
+				CSS. Copy, paste, and customize to build your next project.
+			</p>
+
+			<!-- CTA Buttons -->
+			<div class="flex gap-4 justify-center mb-16">
+				<Button size="lg">
+					Get Started
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="M5 12h14"></path>
+						<path d="m12 5 7 7-7 7"></path>
+					</svg>
+				</Button>
+				<Button variant="outline" href="/components" size="lg"> View Components </Button>
+			</div>
+
+			<!-- Trust indicators -->
+			<div
+				class="flex items-center justify-center gap-8 mb-16 text-sm text-muted-foreground"
+			>
+				<div class="flex items-center gap-2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="text-primary"
+					>
+						<polyline points="20 6 9 17 4 12"></polyline>
+					</svg>
+					<span>Free & Open Source</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="text-primary"
+					>
+						<polyline points="20 6 9 17 4 12"></polyline>
+					</svg>
+					<span>Fully Customizable</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="text-primary"
+					>
+						<polyline points="20 6 9 17 4 12"></polyline>
+					</svg>
+					<span>Accessible by Default</span>
+				</div>
+			</div>
+
+			<!-- Code preview window -->
+			<div class="max-w-3xl mx-auto">
+				<div
+					class="rounded-lg border bg-card shadow-lg overflow-hidden"
+				>
+					<!-- Window header -->
+					<div
+						class="flex items-center gap-2 px-4 py-3 border-b bg-muted/50"
+					>
+						<div class="flex gap-2">
+							<div class="size-3 rounded-full bg-destructive/80">
+							</div>
+							<div class="size-3 rounded-full bg-accent/80"></div>
+							<div class="size-3 rounded-full bg-secondary/80">
+							</div>
+						</div>
+						<div
+							class="flex-1 text-center text-xs text-muted-foreground font-mono"
+						>
+							Button.astro
+						</div>
+					</div>
+					<!-- Code content -->
+					<div class="p-6 text-left bg-card">
+						<pre
+							class="text-sm font-mono overflow-x-auto"><code><span class="text-accent">&lt;Button</span> <span class="text-secondary">variant</span>=<span class="text-primary">"default"</span><span class="text-accent">&gt;</span>
+  Click me
+<span class="text-accent">&lt;/Button&gt;</span>
+
+<span class="text-accent">&lt;Button</span> <span class="text-secondary">variant</span>=<span class="text-primary">"outline"</span><span class="text-accent">&gt;</span>
+  Secondary
+<span class="text-accent">&lt;/Button&gt;</span></code></pre>
+					</div>
+				</div>
+			</div>
+		</Section>
+
+		<!-- Bottom gradient blur -->
+		<div
+			class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent"
+		>
+		</div>
+	</div>
+</Layout>

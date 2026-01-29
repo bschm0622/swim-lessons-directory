@@ -1,0 +1,21 @@
+---
+interface Props {
+  for?: string;
+  class?: string;
+}
+
+const {
+  for: htmlFor,
+  class: className
+} = Astro.props;
+
+const classes = `flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 ${className || ''}`;
+---
+
+<label
+  data-slot="label"
+  for={htmlFor}
+  class={classes}
+>
+  <slot />
+</label>

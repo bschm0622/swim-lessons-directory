@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const classes = `flex flex-col-reverse gap-2 sm:flex-row sm:justify-end ${className || ''}`;
+---
+
+<div
+  data-slot="alert-dialog-footer"
+  class={classes}
+>
+  <slot />
+</div>

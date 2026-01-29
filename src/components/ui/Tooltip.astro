@@ -1,0 +1,170 @@
+---
+interface Props {
+  id: string;
+  class?: string;
+}
+
+const { id, class: className } = Astro.props;
+---
+
+<div data-slot="tooltip" data-tooltip-id={id} class={className}>
+  <slot />
+</div>
+
+<script is:inline>
+  (function() {
+    function initTooltips() {
+      const tooltips = document.querySelectorAll('[data-slot="tooltip"]');
+
+      tooltips.forEach((tooltip) => {
+        if (tooltip.dataset.initialized === 'true') return;
+        tooltip.dataset.initialized = 'true';
+
+        const tooltipId = tooltip.getAttribute('data-tooltip-id');
+        const trigger = tooltip.querySelector('[data-slot="tooltip-trigger"]');
+        const content = tooltip.querySelector('[data-slot="tooltip-content"]');
+
+        if (!trigger || !content) return;
+
+        let timeoutId;
+        let isVisible = false;
+
+        function showTooltip() {
+          if (isVisible) return;
+          isVisible = true;
+          content.setAttribute('data-state', 'open');
+          content.style.display = 'block';
+          // Wait for next frame to ensure content is rendered before positioning
+          requestAnimationFrame(() => {
+            positionTooltip();
+          });
+        }
+
+        function hideTooltip() {
+          if (!isVisible) return;
+          isVisible = false;
+          content.setAttribute('data-state', 'closed');
+          setTimeout(() => {
+            if (!isVisible) {
+              content.style.display = 'none';
+            }
+          }, 150);
+        }
+
+        function positionTooltip() {
+          const triggerRect = trigger.getBoundingClientRect();
+          const contentRect = content.getBoundingClientRect();
+          const side = content.getAttribute('data-side') || 'top';
+          const sideOffset = parseInt(content.getAttribute('data-side-offset') || '8');
+          const arrow = content.querySelector('[data-slot="tooltip-arrow"]');
+
+          let top, left;
+          let idealLeft, idealTop;
+
+          switch (side) {
+            case 'top':
+              top = triggerRect.top - contentRect.height - sideOffset;
+              left = idealLeft = triggerRect.left + triggerRect.width / 2 - contentRect.width / 2;
+              content.setAttribute('data-side', 'top');
+              break;
+            case 'bottom':
+              top = triggerRect.bottom + sideOffset;
+              left = idealLeft = triggerRect.left + triggerRect.width / 2 - contentRect.width / 2;
+              content.setAttribute('data-side', 'bottom');
+              break;
+            case 'left':
+              top = idealTop = triggerRect.top + triggerRect.height / 2 - contentRect.height / 2;
+              left = triggerRect.left - contentRect.width - sideOffset;
+              content.setAttribute('data-side', 'left');
+              break;
+            case 'right':
+              top = idealTop = triggerRect.top + triggerRect.height / 2 - contentRect.height / 2;
+              left = triggerRect.right + sideOffset;
+              content.setAttribute('data-side', 'right');
+              break;
+          }
+
+          // Constrain to viewport
+          const padding = 8;
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+
+          // Adjust horizontal position if going off screen
+          if (left < padding) {
+            left = padding;
+          } else if (left + contentRect.width > viewportWidth - padding) {
+            left = viewportWidth - contentRect.width - padding;
+          }
+
+          // Adjust vertical position if going off screen
+          if (top < padding) {
+            top = padding;
+          } else if (top + contentRect.height > viewportHeight - padding) {
+            top = viewportHeight - contentRect.height - padding;
+          }
+
+          content.style.top = `${top}px`;
+          content.style.left = `${left}px`;
+
+          // Adjust arrow position only if tooltip was shifted due to viewport constraints
+          if (arrow) {
+            const triggerCenterX = triggerRect.left + triggerRect.width / 2;
+            const triggerCenterY = triggerRect.top + triggerRect.height / 2;
+
+            if (side === 'top' || side === 'bottom') {
+              // Only adjust if tooltip was shifted horizontally
+              if (idealLeft !== left) {
+                const arrowLeft = triggerCenterX - left;
+                arrow.style.left = `${arrowLeft}px`;
+              }
+            } else if (side === 'left' || side === 'right') {
+              // Only adjust if tooltip was shifted vertically
+              if (idealTop !== top) {
+                const arrowTop = triggerCenterY - top;
+                arrow.style.top = `${arrowTop}px`;
+              }
+            }
+          }
+        }
+
+        trigger.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+          const delay = parseInt(tooltip.getAttribute('data-delay-duration') || '0');
+          timeoutId = setTimeout(showTooltip, delay);
+        });
+
+        trigger.addEventListener('mouseleave', () => {
+          clearTimeout(timeoutId);
+          hideTooltip();
+        });
+
+        trigger.addEventListener('focus', () => {
+          clearTimeout(timeoutId);
+          showTooltip();
+        });
+
+        trigger.addEventListener('blur', () => {
+          clearTimeout(timeoutId);
+          hideTooltip();
+        });
+
+        // Reposition on scroll/resize
+        window.addEventListener('scroll', () => {
+          if (isVisible) positionTooltip();
+        });
+
+        window.addEventListener('resize', () => {
+          if (isVisible) positionTooltip();
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTooltips);
+    } else {
+      initTooltips();
+    }
+
+    document.addEventListener('astro:page-load', initTooltips);
+  })();
+</script>

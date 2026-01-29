@@ -1,0 +1,97 @@
+---
+interface Props {
+  class?: string;
+  defaultValue?: string;
+}
+
+const {
+  class: className,
+  defaultValue
+} = Astro.props;
+
+const classes = `flex flex-col gap-2 ${className || ''}`;
+---
+
+<div
+  data-slot="tabs"
+  data-default-value={defaultValue}
+  class={classes}
+>
+  <slot />
+</div>
+
+<script is:inline>
+  (function() {
+    function initializeTabs() {
+      const tabs = document.querySelectorAll('[data-slot="tabs"]');
+
+      tabs.forEach((tab) => {
+        // Skip if already initialized
+        if (tab.dataset.tabsInitialized) return;
+        tab.dataset.tabsInitialized = 'true';
+
+        const defaultValue = tab.getAttribute('data-default-value');
+        const triggers = tab.querySelectorAll('[data-slot="tabs-trigger"]');
+        const contents = tab.querySelectorAll('[data-slot="tabs-content"]');
+
+        // Set initial state
+        triggers.forEach((trigger) => {
+          const value = trigger.getAttribute('data-value');
+          if (value === defaultValue) {
+            trigger.setAttribute('data-state', 'active');
+          } else {
+            trigger.setAttribute('data-state', 'inactive');
+          }
+        });
+
+        contents.forEach((content) => {
+          const value = content.getAttribute('data-value');
+          if (value === defaultValue) {
+            content.setAttribute('data-state', 'active');
+            content.style.display = 'block';
+          } else {
+            content.setAttribute('data-state', 'inactive');
+            content.style.display = 'none';
+          }
+        });
+
+        // Add click handlers
+        triggers.forEach((trigger) => {
+          trigger.addEventListener('click', () => {
+            const value = trigger.getAttribute('data-value');
+
+            // Update all triggers
+            triggers.forEach((t) => {
+              if (t.getAttribute('data-value') === value) {
+                t.setAttribute('data-state', 'active');
+              } else {
+                t.setAttribute('data-state', 'inactive');
+              }
+            });
+
+            // Update all contents
+            contents.forEach((content) => {
+              if (content.getAttribute('data-value') === value) {
+                content.setAttribute('data-state', 'active');
+                content.style.display = 'block';
+              } else {
+                content.setAttribute('data-state', 'inactive');
+                content.style.display = 'none';
+              }
+            });
+          });
+        });
+      });
+    }
+
+    // Initialize immediately if DOM is ready, otherwise wait
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeTabs);
+    } else {
+      initializeTabs();
+    }
+
+    // Re-initialize after page transitions
+    document.addEventListener('astro:page-load', initializeTabs);
+  })();
+</script>

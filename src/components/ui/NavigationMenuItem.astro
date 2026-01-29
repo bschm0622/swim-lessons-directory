@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const classes = `relative ${className || ''}`;
+---
+
+<li
+  data-slot="navigation-menu-item"
+  class={classes}
+>
+  <slot />
+</li>

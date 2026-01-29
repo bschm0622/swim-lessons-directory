@@ -1,0 +1,147 @@
+---
+import { Code } from 'astro:components';
+import Button from '@/components/ui/Button.astro';
+
+interface Props {
+  code: string;
+  lang?: string;
+  title?: string;
+  class?: string;
+}
+
+const { code, lang = 'astro', title, class: className } = Astro.props;
+const lineCount = code.split('\n').length;
+const isExpandable = lineCount > 5;
+---
+
+<div class={`code-block-wrapper rounded-lg border border-border overflow-hidden ${className || ''}`} data-expandable={isExpandable}>
+  <div class="px-4 py-2 bg-muted border-b border-border flex items-center justify-between">
+    {title ? (
+      <span class="text-sm font-mono text-muted-foreground">{title}</span>
+    ) : (
+      <div></div>
+    )}
+    <div class="flex items-center gap-2">
+      {isExpandable && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          data-expand-button-header="true"
+        >
+          <span data-expand-text>Expand</span>
+        </Button>
+      )}
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        data-copy-button={code}
+      >
+        Copy
+      </Button>
+    </div>
+  </div>
+  <div class="relative">
+    <div class={`code-content-container ${isExpandable ? 'collapsed' : ''}`} data-state={isExpandable ? 'collapsed' : 'expanded'}>
+      <div class="code-content p-4 transition-all duration-300">
+        <Code code={code} lang={lang as any} class="px-3 py-3 rounded-xl" theme="github-dark" />
+      </div>
+    </div>
+    {isExpandable && (
+      <div class="p-4 pt-2 flex justify-center border-t border-border" data-button-container>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          data-expand-button="true"
+        >
+          <span data-bottom-button-text>Show more</span>
+        </Button>
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .code-content-container.collapsed {
+    max-height: 300px;
+    overflow: hidden;
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    function initCodeBlocks() {
+      // Copy functionality
+      const copyButtons = document.querySelectorAll('[data-copy-button]');
+      copyButtons.forEach((button) => {
+        // Skip if already initialized
+        if (button.dataset.initialized) return;
+        button.dataset.initialized = 'true';
+
+        button.addEventListener('click', async () => {
+          const code = button.getAttribute('data-copy-button');
+          if (code) {
+            await navigator.clipboard.writeText(code);
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+              button.textContent = originalText;
+            }, 2000);
+          }
+        });
+      });
+
+      // Expand/collapse functionality
+      const expandButtons = document.querySelectorAll('[data-expand-button="true"], [data-expand-button-header="true"]');
+      console.log('Found expand buttons:', expandButtons.length);
+
+      expandButtons.forEach((button) => {
+        // Skip if already initialized
+        if (button.dataset.initialized) return;
+        button.dataset.initialized = 'true';
+
+        console.log('Adding listener to button:', button);
+
+        button.addEventListener('click', (e) => {
+          console.log('Button clicked!');
+          e.preventDefault();
+
+          const wrapper = button.closest('.code-block-wrapper');
+          const container = wrapper.querySelector('.code-content-container');
+          const bottomButtonContainer = wrapper.querySelector('[data-button-container]');
+          const headerExpandText = wrapper.querySelector('[data-expand-text]');
+          const bottomButtonText = wrapper.querySelector('[data-bottom-button-text]');
+          const state = container.getAttribute('data-state');
+
+          console.log('Current state:', state);
+
+          if (state === 'collapsed') {
+            container.classList.remove('collapsed');
+            container.setAttribute('data-state', 'expanded');
+            if (bottomButtonContainer) bottomButtonContainer.style.display = 'flex';
+            if (headerExpandText) headerExpandText.textContent = 'Collapse';
+            if (bottomButtonText) bottomButtonText.textContent = 'Show less';
+          } else {
+            container.classList.add('collapsed');
+            container.setAttribute('data-state', 'collapsed');
+            if (bottomButtonContainer) bottomButtonContainer.style.display = 'flex';
+            if (headerExpandText) headerExpandText.textContent = 'Expand';
+            if (bottomButtonText) bottomButtonText.textContent = 'Show more';
+          }
+        });
+      });
+    }
+
+    // Initialize immediately if DOM is ready, otherwise wait
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCodeBlocks);
+    } else {
+      initCodeBlocks();
+    }
+
+    // Re-initialize after page transitions
+    document.addEventListener('astro:page-load', initCodeBlocks);
+  })();
+</script>

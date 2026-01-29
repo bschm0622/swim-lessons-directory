@@ -1,0 +1,92 @@
+---
+import ThemeToggle from "@/components/ui/LightDarkToggle.astro";
+import NavigationMenu from "@/components/ui/NavigationMenu.astro";
+import NavigationMenuList from "@/components/ui/NavigationMenuList.astro";
+import NavigationMenuItem from "@/components/ui/NavigationMenuItem.astro";
+import NavigationMenuLink from "@/components/ui/NavigationMenuLink.astro";
+import Sidebar from "@/components/ui/Sidebar.astro";
+import SidebarTrigger from "@/components/ui/SidebarTrigger.astro";
+import SidebarContent from "@/components/ui/SidebarContent.astro";
+import SidebarHeader from "@/components/ui/SidebarHeader.astro";
+import SidebarClose from "@/components/ui/SidebarClose.astro";
+import Button from "@/components/ui/Button.astro";
+import SearchModal from "@/components/SearchModal.astro";
+import { SITE } from "@/siteConfig";
+
+const navLinks = SITE.nav;
+---
+
+<Sidebar id="mobile-nav" side="left">
+    <SidebarHeader>
+        <h2 class="text-lg font-semibold">{SITE.name || SITE.title}</h2>
+        <SidebarClose />
+    </SidebarHeader>
+    <SidebarContent>
+        <nav>
+            {navLinks.map((link) => (
+                <a
+                    href={link.href}
+                    class="block px-3 py-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                >
+                    {link.label}
+                </a>
+            ))}
+        </nav>
+    </SidebarContent>
+</Sidebar>
+
+<nav class="sticky top-0 px-4 py-4 flex items-center justify-between bg-background border-b border-border z-[100]">
+    <!-- Logo -->
+    <a href="/" class="text-xl font-semibold">
+        {SITE.name || SITE.title}
+    </a>
+
+    <!-- Desktop Navigation -->
+    <div class="hidden md:flex items-center gap-2">
+        <NavigationMenu viewport={false}>
+            <NavigationMenuList>
+                {navLinks.map((link) => (
+                    <NavigationMenuItem>
+                        <NavigationMenuLink
+                            href={link.href}
+                            class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                        >
+                            {link.label}
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                ))}
+            </NavigationMenuList>
+        </NavigationMenu>
+        <Button
+            variant="outline"
+            onclick="window.openSearchModal()"
+            class="text-muted-foreground hover:text-foreground hover:border-primary"
+            aria-label="Search"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <span>Search</span>
+            <kbd class="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 bg-muted rounded text-xs text-foreground">
+                <span>⌘</span>
+                <span>K</span>
+            </kbd>
+        </Button>
+        <ThemeToggle />
+    </div>
+
+    <!-- Mobile Nav -->
+    <div class="flex items-center md:hidden gap-2">
+        <Button variant="ghost" size="icon" onclick="window.openSearchModal()" aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+        </Button>
+        <ThemeToggle />
+        <SidebarTrigger sidebarId="mobile-nav" />
+    </div>
+</nav>
+
+<SearchModal />

@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const classes = `group flex flex-1 list-none items-center justify-center gap-1 ${className || ''}`;
+---
+
+<ul
+  data-slot="navigation-menu-list"
+  class={classes}
+>
+  <slot />
+</ul>

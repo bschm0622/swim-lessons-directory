@@ -1,0 +1,60 @@
+---
+interface Props {
+  class?: string;
+  orientation?: 'vertical' | 'horizontal' | 'both';
+}
+
+const {
+  class: className,
+  orientation = 'vertical'
+} = Astro.props;
+---
+
+<div
+  data-slot="scroll-area"
+  class:list={['scroll-area relative h-full', className]}
+>
+  <div
+    data-slot="scroll-area-viewport"
+    class:list={[
+      'scroll-area-viewport h-full w-full rounded-[inherit]',
+      orientation === 'vertical' && 'overflow-y-auto overflow-x-hidden',
+      orientation === 'horizontal' && 'overflow-x-auto overflow-y-hidden',
+      orientation === 'both' && 'overflow-auto'
+    ]}
+  >
+    <slot />
+  </div>
+</div>
+
+<style>
+  .scroll-area-viewport {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+    scrollbar-gutter: stable;
+  }
+
+  .scroll-area-viewport::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scroll-area-viewport::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-area-viewport::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .scroll-area-viewport::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--border) / 0.8);
+  }
+
+  .scroll-area-viewport::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+</style>

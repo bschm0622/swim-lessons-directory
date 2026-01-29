@@ -1,0 +1,153 @@
+---
+import PagefindSearch from "astro-pagefind/components/Search";
+import AlertDialog from "@/components/ui/AlertDialog.astro";
+import AlertDialogContent from "@/components/ui/AlertDialogContent.astro";
+---
+
+<AlertDialog id="search-modal">
+    <AlertDialogContent class="max-w-2xl">
+        <div class="relative">
+            <h2 class="sr-only">Search</h2>
+            <PagefindSearch
+                id="search-modal"
+                className="pagefind-ui"
+                uiOptions={{
+                    showImages: false,
+                    translations: { placeholder: "Search..." },
+                }}
+            />
+
+            <!-- Close hint - ESC key (desktop only) -->
+            <div class="hidden md:block absolute top-0 right-0 text-xs text-muted-foreground">
+                <kbd class="px-2 py-1 bg-muted rounded text-foreground">ESC</kbd>
+            </div>
+        </div>
+    </AlertDialogContent>
+</AlertDialog>
+
+<script>
+    declare global {
+        interface Window {
+            openSearchModal: () => void;
+        }
+    }
+
+    function initSearchModal() {
+        const dialog = document.querySelector('[data-dialog-id="search-modal"]') as HTMLElement;
+        if (!dialog) return;
+
+        const overlay = dialog.querySelector('[data-slot="alert-dialog-overlay"]') as HTMLElement;
+        const content = dialog.querySelector('[data-slot="alert-dialog-content"]') as HTMLElement;
+
+        function openModal() {
+            dialog.setAttribute('data-state', 'open');
+            dialog.style.display = 'block';
+
+            if (overlay) {
+                overlay.setAttribute('data-state', 'open');
+                overlay.style.opacity = '1';
+            }
+
+            if (content) {
+                content.setAttribute('data-state', 'open');
+                requestAnimationFrame(() => {
+                    content.style.opacity = '1';
+                    content.style.transform = 'translate(-50%, -50%) scale(1)';
+                });
+            }
+
+            // Focus search input
+            setTimeout(() => {
+                const searchInput = dialog.querySelector('input[type="text"]') as HTMLInputElement;
+                searchInput?.focus();
+            }, 100);
+        }
+
+        function closeModal() {
+            dialog.setAttribute('data-state', 'closed');
+
+            if (overlay) {
+                overlay.setAttribute('data-state', 'closed');
+                overlay.style.opacity = '0';
+            }
+
+            if (content) {
+                content.setAttribute('data-state', 'closed');
+                content.style.opacity = '0';
+                content.style.transform = 'translate(-50%, -50%) scale(0.95)';
+            }
+
+            setTimeout(() => {
+                dialog.style.display = 'none';
+            }, 200);
+        }
+
+        // Expose openModal globally
+        window.openSearchModal = openModal;
+
+        // Close on overlay click
+        if (overlay) {
+            overlay.addEventListener('click', closeModal);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener("keydown", (e) => {
+            const isModalOpen = dialog.getAttribute('data-state') === 'open';
+
+            // ESC to close
+            if (e.key === "Escape" && isModalOpen) {
+                closeModal();
+            }
+
+            // Cmd/Ctrl + K to open
+            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                e.preventDefault();
+                openModal();
+            }
+        });
+    }
+
+    // Initialize on page load and after view transitions
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initSearchModal);
+    } else {
+        initSearchModal();
+    }
+    document.addEventListener("astro:page-load", initSearchModal);
+</script>
+
+<style is:global>
+    #search-modal .pagefind-ui {
+        --pagefind-ui-primary: var(--color-primary);
+        --pagefind-ui-text: var(--color-foreground);
+        --pagefind-ui-background: var(--color-background);
+        --pagefind-ui-border: var(--color-border);
+        --pagefind-ui-font: var(--font-sans);
+    }
+
+    #search-modal .pagefind-ui__search-input {
+        font-family: var(--font-sans);
+    }
+
+    #search-modal .pagefind-ui__search-clear {
+        color: var(--color-muted-foreground);
+    }
+
+    #search-modal .pagefind-ui__message {
+        color: var(--color-muted-foreground);
+    }
+
+    #search-modal .pagefind-ui__result-title,
+    #search-modal .pagefind-ui__result-link {
+        font-family: var(--font-sans);
+    }
+
+    #search-modal .pagefind-ui__result-excerpt {
+        font-family: var(--font-sans);
+    }
+
+    #search-modal .pagefind-ui__results-area {
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+</style>

@@ -1,0 +1,105 @@
+---
+interface Props {
+  id?: string;
+  class?: string;
+}
+
+const {
+  id,
+  class: className
+} = Astro.props;
+
+const uniqueId = id || `dropdown-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class:list={['dropdown-menu relative inline-block', className]} data-dropdown-id={uniqueId}>
+  <slot />
+</div>
+
+<script is:inline>
+  // Re-run this when new dropdowns are added
+  function initDropdowns() {
+    document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
+      // Skip if already initialized
+      if (dropdown.dataset.initialized) return;
+      dropdown.dataset.initialized = 'true';
+
+      const trigger = dropdown.querySelector('[data-slot="dropdown-menu-trigger"]');
+      const content = dropdown.querySelector('[data-slot="dropdown-menu-content"]');
+
+      if (!trigger || !content) return;
+
+      // Toggle dropdown
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        const isOpen = content.classList.contains('hidden') === false;
+
+        // Close all other dropdowns
+        document.querySelectorAll('[data-slot="dropdown-menu-content"]').forEach(c => {
+          if (c !== content) {
+            c.classList.add('hidden');
+          }
+        });
+
+        // Toggle this dropdown
+        if (isOpen) {
+          content.classList.add('hidden');
+        } else {
+          // Check if there's enough space below/above
+          const triggerRect = trigger.getBoundingClientRect();
+          const viewportHeight = window.innerHeight;
+          const viewportWidth = window.innerWidth;
+          const spaceBelow = viewportHeight - triggerRect.bottom;
+          const spaceAbove = triggerRect.top;
+          const spaceRight = viewportWidth - triggerRect.right;
+          const spaceLeft = triggerRect.left;
+
+          // Remove existing positioning classes
+          content.classList.remove('bottom-full', 'mb-2', 'mt-2', 'left-0', 'right-0');
+
+          // Position vertically based on available space
+          if (spaceBelow < 300 && spaceAbove > spaceBelow) {
+            // Open upward
+            content.classList.add('bottom-full', 'mb-2');
+          } else {
+            // Open downward (default)
+            content.classList.add('mt-2');
+          }
+
+          // Position horizontally based on available space
+          if (spaceRight < 200 && spaceLeft > spaceRight) {
+            // Align right
+            content.classList.add('right-0');
+          } else {
+            // Align left (default)
+            content.classList.add('left-0');
+          }
+
+          content.classList.remove('hidden');
+        }
+      });
+    });
+  }
+
+  function setupClickOutsideHandler() {
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      // Check if click is inside a dropdown menu
+      if (!e.target.closest('.dropdown-menu')) {
+        document.querySelectorAll('[data-slot="dropdown-menu-content"]').forEach(content => {
+          content.classList.add('hidden');
+        });
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initDropdowns();
+    setupClickOutsideHandler();
+  });
+
+  document.addEventListener('astro:page-load', function() {
+    initDropdowns();
+  });
+</script>

@@ -1,0 +1,33 @@
+---
+import Tabs from '@/components/ui/Tabs.astro';
+import TabsList from '@/components/ui/TabsList.astro';
+import TabsTrigger from '@/components/ui/TabsTrigger.astro';
+import TabsContent from '@/components/ui/TabsContent.astro';
+import CodeBlock from '@/components/ui/CodeBlock.astro';
+
+interface Props {
+  code: string;
+  class?: string;
+}
+
+const { code, class: className } = Astro.props;
+---
+
+<Tabs defaultValue="preview" class={className}>
+  <TabsList>
+    <TabsTrigger value="preview">Preview</TabsTrigger>
+    <TabsTrigger value="code">Code</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="preview">
+    <div class="rounded-lg border border-border p-8 bg-background">
+      <div class="flex items-center justify-center">
+        <slot />
+      </div>
+    </div>
+  </TabsContent>
+
+  <TabsContent value="code">
+    <CodeBlock code={code} />
+  </TabsContent>
+</Tabs>

@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  src?: string | ImageMetadata;
+  alt?: string;
+  fallback?: string;
+  class?: string;
+}
+
+const {
+  src,
+  alt = '',
+  fallback,
+  class: className
+} = Astro.props;
+
+// Check if src is a remote URL (string) or local import (ImageMetadata)
+const isRemote = typeof src === 'string';
+---
+
+<div
+  data-slot="avatar"
+  class:list={[
+    'relative flex size-10 shrink-0 overflow-hidden rounded-full',
+    className
+  ]}
+>
+  {src ? (
+    isRemote ? (
+      <img
+        src={src}
+        alt={alt}
+        data-slot="avatar-image"
+        class="aspect-square size-full object-cover"
+      />
+    ) : (
+      <Image
+        src={src}
+        alt={alt}
+        data-slot="avatar-image"
+        class="aspect-square size-full object-cover"
+        widths={[40, 48, 64, 80]}
+        sizes="(max-width: 640px) 40px, (max-width: 768px) 48px, 64px"
+        format="webp"
+      />
+    )
+  ) : (
+    <div
+      data-slot="avatar-fallback"
+      class="bg-muted flex size-full items-center justify-center rounded-full text-sm font-medium"
+    >
+      {fallback}
+    </div>
+  )}
+</div>

@@ -1,0 +1,174 @@
+---
+interface Props {
+  class?: string;
+  viewport?: boolean;
+}
+
+const {
+  class: className,
+  viewport = true
+} = Astro.props;
+
+const classes = `group/navigation-menu relative flex max-w-max flex-1 items-center justify-center ${className || ''}`;
+---
+
+<nav
+  data-slot="navigation-menu"
+  data-viewport={viewport}
+  class={classes}
+>
+  <slot />
+  {viewport && (
+    <div class="absolute top-full left-0 isolate z-50 flex justify-center">
+      <div
+        data-slot="navigation-menu-viewport"
+        class="origin-top-center bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-1.5 overflow-hidden rounded-md border border-border shadow transition-all duration-200"
+        data-state="closed"
+        style="height: 0; width: 0;"
+      ></div>
+    </div>
+  )}
+</nav>
+
+<script is:inline>
+  (function() {
+    function initializeNavigationMenus() {
+      const menus = document.querySelectorAll('[data-slot="navigation-menu"]');
+
+      menus.forEach((menu) => {
+        // Skip if already initialized
+        if (menu.dataset.navMenuInitialized) return;
+        menu.dataset.navMenuInitialized = 'true';
+
+        const items = menu.querySelectorAll('[data-slot="navigation-menu-item"]');
+        const viewport = menu.querySelector('[data-slot="navigation-menu-viewport"]');
+        const hasViewport = menu.getAttribute('data-viewport') === 'true';
+        let closeTimeout = null;
+        let openTimeout = null;
+        let currentItem = null;
+
+        function openItem(item) {
+          // If this is already the current item, do nothing
+          if (currentItem === item) return;
+
+          // Clear any pending actions
+          if (closeTimeout) {
+            clearTimeout(closeTimeout);
+            closeTimeout = null;
+          }
+          if (openTimeout) {
+            clearTimeout(openTimeout);
+            openTimeout = null;
+          }
+
+          const trigger = item.querySelector('[data-slot="navigation-menu-trigger"]');
+          const content = item.querySelector('[data-slot="navigation-menu-content"]');
+          if (!trigger || !content) return;
+
+          // Add a small delay before opening to prevent rapid flickering
+          openTimeout = setTimeout(() => {
+            // Close all other items with smooth transition
+            items.forEach((otherItem) => {
+              if (otherItem !== item) {
+                const otherTrigger = otherItem.querySelector('[data-slot="navigation-menu-trigger"]');
+                const otherContent = otherItem.querySelector('[data-slot="navigation-menu-content"]');
+                if (otherTrigger && otherContent) {
+                  otherTrigger.setAttribute('data-state', 'closed');
+                  otherContent.setAttribute('data-state', 'closed');
+                  otherContent.style.transition = 'opacity 200ms ease-out, transform 200ms ease-out';
+                  otherContent.style.opacity = '0';
+                  otherContent.style.transform = 'scale(0.96) translateY(-4px)';
+                  setTimeout(() => {
+                    otherContent.style.display = 'none';
+                  }, 200);
+                }
+              }
+            });
+
+            // Open current item with smooth transition
+            trigger.setAttribute('data-state', 'open');
+            content.setAttribute('data-state', 'open');
+            content.style.display = 'block';
+            content.style.transition = 'opacity 250ms ease-out, transform 250ms ease-out';
+            content.style.opacity = '0';
+            content.style.transform = 'scale(0.96) translateY(-4px)';
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                content.style.opacity = '1';
+                content.style.transform = 'scale(1) translateY(0)';
+              });
+            });
+
+            if (hasViewport && viewport) {
+              viewport.setAttribute('data-state', 'open');
+              viewport.style.transition = 'height 250ms ease-out, width 250ms ease-out';
+              viewport.innerHTML = '';
+              viewport.appendChild(content.cloneNode(true));
+              const rect = content.getBoundingClientRect();
+              viewport.style.height = rect.height + 'px';
+              viewport.style.width = rect.width + 'px';
+            }
+
+            currentItem = item;
+          }, 100); // 100ms delay before opening
+        }
+
+        function closeAllItems() {
+          items.forEach((item) => {
+            const trigger = item.querySelector('[data-slot="navigation-menu-trigger"]');
+            const content = item.querySelector('[data-slot="navigation-menu-content"]');
+            if (trigger && content) {
+              trigger.setAttribute('data-state', 'closed');
+              content.setAttribute('data-state', 'closed');
+              content.style.transition = 'opacity 200ms ease-out, transform 200ms ease-out';
+              content.style.opacity = '0';
+              content.style.transform = 'scale(0.96) translateY(-4px)';
+              setTimeout(() => {
+                content.style.display = 'none';
+              }, 200);
+            }
+          });
+          if (hasViewport && viewport) {
+            viewport.setAttribute('data-state', 'closed');
+            viewport.style.transition = 'height 200ms ease-out, width 200ms ease-out';
+            viewport.style.height = '0';
+            viewport.style.width = '0';
+          }
+          currentItem = null;
+        }
+
+        items.forEach((item) => {
+          const trigger = item.querySelector('[data-slot="navigation-menu-trigger"]');
+          if (!trigger) return;
+
+          // Open on hover with slight delay
+          item.addEventListener('mouseenter', () => {
+            if (closeTimeout) {
+              clearTimeout(closeTimeout);
+              closeTimeout = null;
+            }
+            openItem(item);
+          });
+
+          item.addEventListener('mouseleave', () => {
+            closeTimeout = setTimeout(() => {
+              closeAllItems();
+            }, 150); // Reduced from 300ms for snappier feel
+          });
+        });
+      });
+    }
+
+    // Initialize immediately if DOM is ready, otherwise wait
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeNavigationMenus);
+    } else {
+      initializeNavigationMenus();
+    }
+
+    // Re-initialize after page transitions
+    document.addEventListener('astro:page-load', initializeNavigationMenus);
+  })();
+</script>

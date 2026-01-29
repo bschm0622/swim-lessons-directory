@@ -1,0 +1,98 @@
+---
+interface Props {
+  id: string;
+  open?: boolean;
+}
+
+const { id, open = false } = Astro.props;
+---
+
+<div
+  data-slot="alert-dialog"
+  data-dialog-id={id}
+  data-state={open ? "open" : "closed"}
+  style={open ? "" : "display: none;"}
+>
+  <slot />
+</div>
+
+<script is:inline>
+  function initializeAlertDialogs() {
+    const dialogs = document.querySelectorAll('[data-slot="alert-dialog"]');
+
+    dialogs.forEach((dialog) => {
+      // Skip if already initialized
+      if (dialog.dataset.initialized) return;
+      dialog.dataset.initialized = 'true';
+
+      const dialogId = dialog.getAttribute('data-dialog-id');
+      const triggers = document.querySelectorAll(`[data-slot="alert-dialog-trigger"][data-dialog-id="${dialogId}"]`);
+      const overlay = dialog.querySelector('[data-slot="alert-dialog-overlay"]');
+      const content = dialog.querySelector('[data-slot="alert-dialog-content"]');
+      const cancels = dialog.querySelectorAll('[data-slot="alert-dialog-cancel"]');
+      const actions = dialog.querySelectorAll('[data-slot="alert-dialog-action"]');
+
+      function openDialog() {
+        dialog.setAttribute('data-state', 'open');
+        dialog.style.display = 'block';
+        if (overlay) {
+          overlay.setAttribute('data-state', 'open');
+          overlay.style.opacity = '1';
+        }
+        if (content) {
+          content.setAttribute('data-state', 'open');
+          requestAnimationFrame(() => {
+            content.style.opacity = '1';
+            content.style.transform = 'translate(-50%, -50%) scale(1)';
+          });
+        }
+      }
+
+      function closeDialog() {
+        dialog.setAttribute('data-state', 'closed');
+        if (overlay) {
+          overlay.setAttribute('data-state', 'closed');
+          overlay.style.opacity = '0';
+        }
+        if (content) {
+          content.setAttribute('data-state', 'closed');
+          content.style.opacity = '0';
+          content.style.transform = 'translate(-50%, -50%) scale(0.95)';
+        }
+        setTimeout(() => {
+          dialog.style.display = 'none';
+        }, 200);
+      }
+
+      triggers.forEach((trigger) => {
+        // Add click to the wrapper and any buttons inside
+        trigger.addEventListener('click', (e) => {
+          openDialog();
+        });
+
+        // Also add to any buttons inside the trigger
+        const buttons = trigger.querySelectorAll('button');
+        buttons.forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            openDialog();
+          });
+        });
+      });
+
+      if (overlay) {
+        overlay.addEventListener('click', closeDialog);
+      }
+
+      cancels.forEach((cancel) => {
+        cancel.addEventListener('click', closeDialog);
+      });
+
+      actions.forEach((action) => {
+        action.addEventListener('click', closeDialog);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initializeAlertDialogs);
+  document.addEventListener('astro:page-load', initializeAlertDialogs);
+</script>

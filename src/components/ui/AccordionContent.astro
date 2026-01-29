@@ -1,0 +1,27 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div
+  data-slot="accordion-content"
+  data-state="closed"
+  class="overflow-hidden text-sm transition-all duration-200"
+>
+  <div class={`pt-0 pb-4 ${className || ''}`}>
+    <slot />
+  </div>
+</div>
+
+<style>
+  [data-slot="accordion-content"][data-state="open"] {
+    max-height: 1000px;
+  }
+
+  [data-slot="accordion-content"][data-state="closed"] {
+    max-height: 0;
+  }
+</style>

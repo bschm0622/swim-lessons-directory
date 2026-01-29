@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const classes = `flex flex-col gap-2 text-center sm:text-left ${className || ''}`;
+---
+
+<div
+  data-slot="alert-dialog-header"
+  class={classes}
+>
+  <slot />
+</div>

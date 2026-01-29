@@ -1,0 +1,23 @@
+---
+interface Props {
+  class?: string;
+  value: string;
+}
+
+const {
+  class: className,
+  value
+} = Astro.props;
+
+const classes = `flex-1 outline-none ${className || ''}`;
+---
+
+<div
+  data-slot="tabs-content"
+  data-value={value}
+  data-state="inactive"
+  class={classes}
+  style="display: none;"
+>
+  <slot />
+</div>

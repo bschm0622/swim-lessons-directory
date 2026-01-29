@@ -1,0 +1,48 @@
+---
+interface Props {
+  id?: string;
+  name?: string;
+  placeholder?: string;
+  value?: string;
+  disabled?: boolean;
+  required?: boolean;
+  rows?: number;
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  id,
+  name,
+  placeholder,
+  value,
+  disabled = false,
+  required = false,
+  rows = 4,
+  class: className,
+  ...props
+} = Astro.props;
+---
+
+<textarea
+  id={id}
+  name={name}
+  placeholder={placeholder}
+  value={value}
+  disabled={disabled}
+  required={required}
+  rows={rows}
+  data-slot="textarea"
+  class:list={[
+    'flex min-h-16 w-full rounded-md border border-border bg-background px-3 py-2 text-base shadow-xs',
+    'transition-[color,box-shadow] outline-none',
+    'placeholder:text-muted-foreground',
+    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+    'disabled:cursor-not-allowed disabled:opacity-50',
+    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+    'dark:bg-input/30',
+    'md:text-sm',
+    className
+  ]}
+  {...props}
+></textarea>

@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const classes = `text-lg font-semibold ${className || ''}`;
+---
+
+<h2
+  data-slot="alert-dialog-title"
+  class={classes}
+>
+  <slot />
+</h2>

@@ -1,0 +1,51 @@
+---
+interface Props {
+  id: string;
+  name: string;
+  value: string;
+  checked?: boolean;
+  disabled?: boolean;
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  id,
+  name,
+  value,
+  checked = false,
+  disabled = false,
+  class: className,
+  ...props
+} = Astro.props;
+---
+
+<div class="relative inline-flex">
+  <input
+    type="radio"
+    id={id}
+    name={name}
+    value={value}
+    checked={checked}
+    disabled={disabled}
+    data-slot="radio-group-item"
+    class:list={[
+      'peer size-4 shrink-0 rounded-full border border-border shadow-xs transition-[color,box-shadow] outline-none',
+      'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+      'disabled:cursor-not-allowed disabled:opacity-50',
+      'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+      'dark:bg-input/30',
+      'appearance-none cursor-pointer',
+      className
+    ]}
+    {...props}
+  />
+  <svg
+    class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-2 hidden peer-checked:block text-primary fill-primary"
+    viewBox="0 0 15 15"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="7.5" cy="7.5" r="7.5" />
+  </svg>
+</div>

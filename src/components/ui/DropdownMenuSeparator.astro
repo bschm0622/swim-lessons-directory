@@ -1,0 +1,14 @@
+---
+interface Props {
+  class?: string;
+}
+
+const {
+  class: className
+} = Astro.props;
+---
+
+<div
+  data-slot="dropdown-menu-separator"
+  class:list={['-mx-1 my-1 h-px bg-border', className]}
+/>

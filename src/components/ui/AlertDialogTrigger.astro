@@ -1,0 +1,16 @@
+---
+interface Props {
+  dialogId: string;
+  class?: string;
+}
+
+const { dialogId, class: className } = Astro.props;
+---
+
+<div
+  data-slot="alert-dialog-trigger"
+  data-dialog-id={dialogId}
+  class={className}
+>
+  <slot />
+</div>

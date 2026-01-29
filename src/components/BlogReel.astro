@@ -1,0 +1,68 @@
+---
+import { getCollection } from "astro:content";
+import Card from "@/components/ui/Card.astro";
+import CardHeader from "@/components/ui/CardHeader.astro";
+import CardTitle from "@/components/ui/CardTitle.astro";
+import CardDescription from "@/components/ui/CardDescription.astro";
+import CardFooter from "@/components/ui/CardFooter.astro";
+
+const allPosts = await getCollection("blog");
+// Sort posts by date, newest first
+const sortedPosts = allPosts.sort((a, b) =>
+    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
+---
+
+<div class="container mx-auto px-4 py-12 max-w-4xl">
+    <div class="mb-12">
+        <h2 class="text-3xl font-semibold mb-4 text-foreground">Blog Posts</h2>
+        <p class="text-lg text-muted-foreground">
+            My journey learning Astro and building with modern web technologies.
+        </p>
+    </div>
+
+    <div class="space-y-6">
+        {
+            sortedPosts.map((post: any) => (
+                <a href={`/blog/${post.id}/`} class="block group">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>
+                                {post.data.title}
+                            </CardTitle>
+                            {post.data.description && (
+                                <CardDescription>
+                                    {post.data.description}
+                                </CardDescription>
+                            )}
+                        </CardHeader>
+                        {(post.data.pubDate || post.data.author) && (
+                            <CardFooter>
+                                <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                                    {post.data.pubDate && (
+                                        <time datetime={post.data.pubDate}>
+                                            {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}
+                                        </time>
+                                    )}
+                                    {post.data.author && (
+                                        <span>By {post.data.author}</span>
+                                    )}
+                                </div>
+                            </CardFooter>
+                        )}
+                    </Card>
+                </a>
+            ))
+        }
+    </div>
+
+    {sortedPosts.length === 0 && (
+        <div class="text-center py-12 text-muted-foreground">
+            <p>No blog posts yet. Check back soon!</p>
+        </div>
+    )}
+</div>

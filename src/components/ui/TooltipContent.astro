@@ -1,0 +1,40 @@
+---
+interface Props {
+  side?: 'top' | 'bottom' | 'left' | 'right';
+  sideOffset?: number;
+  class?: string;
+}
+
+const { side = 'top', sideOffset = 8, class: className } = Astro.props;
+---
+
+<div
+  data-slot="tooltip-content"
+  data-side={side}
+  data-side-offset={sideOffset}
+  data-state="closed"
+  class:list={[
+    'fixed z-[130] w-fit rounded-md bg-foreground text-background px-3 py-1.5 text-xs text-balance',
+    'transition-opacity duration-150',
+    'data-[state=open]:opacity-100 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+    'data-[state=closed]:opacity-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+    'data-[side=bottom]:slide-in-from-top-2',
+    'data-[side=left]:slide-in-from-right-2',
+    'data-[side=right]:slide-in-from-left-2',
+    'data-[side=top]:slide-in-from-bottom-2',
+    className
+  ]}
+  style="display: none;"
+>
+  <slot />
+  <div
+    data-slot="tooltip-arrow"
+    class:list={[
+      'absolute bg-foreground size-2.5 rotate-45 rounded-[2px]',
+      side === 'top' && 'bottom-[-5px] left-1/2 -translate-x-1/2',
+      side === 'bottom' && 'top-[-5px] left-1/2 -translate-x-1/2',
+      side === 'left' && 'right-[-5px] top-1/2 -translate-y-1/2',
+      side === 'right' && 'left-[-5px] top-1/2 -translate-y-1/2'
+    ]}
+  ></div>
+</div>

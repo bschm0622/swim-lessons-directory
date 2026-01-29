@@ -1,0 +1,107 @@
+---
+interface Props {
+  id: string;
+  side?: 'left' | 'right';
+  class?: string;
+}
+
+const { id, side = 'left', class: className } = Astro.props;
+
+const sideClasses = side === 'left' ? 'left-0' : 'right-0';
+const slideClasses = side === 'left' ? 'translate-x-[-100%]' : 'translate-x-[100%]';
+---
+
+<div
+  data-slot="sidebar"
+  data-sidebar-id={id}
+  data-state="closed"
+  class={`fixed top-0 ${sideClasses} h-full w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-lg z-[120] transform transition-transform duration-300 ${className || ''}`}
+  style={`transform: ${side === 'left' ? 'translateX(-100%)' : 'translateX(100%)'};`}
+>
+  <div class="flex flex-col h-full">
+    <slot />
+  </div>
+</div>
+
+<div
+  data-slot="sidebar-overlay"
+  data-sidebar-id={id}
+  data-state="closed"
+  class="fixed inset-0 bg-black/50 z-[115] transition-opacity duration-300 opacity-0 pointer-events-none"
+></div>
+
+<script is:inline>
+  (function() {
+    function initSidebars() {
+      const sidebars = document.querySelectorAll('[data-slot="sidebar"]');
+
+      sidebars.forEach((sidebar) => {
+        // Skip if already initialized
+        if (sidebar.dataset.initialized === 'true') return;
+        sidebar.dataset.initialized = 'true';
+
+        const sidebarId = sidebar.getAttribute('data-sidebar-id');
+        const overlay = document.querySelector(`[data-slot="sidebar-overlay"][data-sidebar-id="${sidebarId}"]`);
+        const triggers = document.querySelectorAll(`[data-slot="sidebar-trigger"][data-sidebar-id="${sidebarId}"]`);
+        const closes = sidebar.querySelectorAll('[data-slot="sidebar-close"]');
+
+        function openSidebar() {
+          sidebar.setAttribute('data-state', 'open');
+          sidebar.style.transform = 'translateX(0)';
+          if (overlay) {
+            overlay.setAttribute('data-state', 'open');
+            overlay.style.opacity = '1';
+            overlay.style.pointerEvents = 'auto';
+          }
+          document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+          sidebar.setAttribute('data-state', 'closed');
+          const side = sidebar.classList.contains('left-0') ? 'left' : 'right';
+          sidebar.style.transform = side === 'left' ? 'translateX(-100%)' : 'translateX(100%)';
+          if (overlay) {
+            overlay.setAttribute('data-state', 'closed');
+            overlay.style.opacity = '0';
+            overlay.style.pointerEvents = 'none';
+          }
+          document.body.style.overflow = '';
+        }
+
+        triggers.forEach((trigger) => {
+          trigger.addEventListener('click', () => {
+            const isOpen = sidebar.getAttribute('data-state') === 'open';
+            if (isOpen) {
+              closeSidebar();
+            } else {
+              openSidebar();
+            }
+          });
+        });
+
+        if (overlay) {
+          overlay.addEventListener('click', closeSidebar);
+        }
+
+        closes.forEach((close) => {
+          close.addEventListener('click', closeSidebar);
+        });
+
+        // Close sidebar on link click
+        const links = sidebar.querySelectorAll('a');
+        links.forEach((link) => {
+          link.addEventListener('click', closeSidebar);
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSidebars);
+    } else {
+      initSidebars();
+    }
+
+    // Reinitialize on Astro page navigation
+    document.addEventListener('astro:page-load', initSidebars);
+  })();
+</script>

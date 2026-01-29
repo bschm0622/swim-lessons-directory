@@ -1,0 +1,81 @@
+---
+interface Props {
+  type?: 'single' | 'multiple';
+  collapsible?: boolean;
+  class?: string;
+}
+
+const { type = 'single', collapsible = false, class: className } = Astro.props;
+---
+
+<div
+  class={`accordion ${className || ''}`}
+  data-slot="accordion"
+  data-type={type}
+  data-collapsible={collapsible}
+>
+  <slot />
+</div>
+
+<script is:inline>
+  function initializeAccordions() {
+    const accordions = document.querySelectorAll('[data-slot="accordion"]');
+
+    accordions.forEach((accordion) => {
+      const type = accordion.getAttribute('data-type') || 'single';
+      const collapsible = accordion.getAttribute('data-collapsible') === 'true';
+
+      // Set initial closed state
+      const allContents = accordion.querySelectorAll('[data-slot="accordion-content"]');
+      allContents.forEach((content) => {
+        if (content.getAttribute('data-state') === 'closed') {
+          content.style.maxHeight = '0';
+        }
+      });
+
+      const triggers = accordion.querySelectorAll('[data-slot="accordion-trigger"]');
+
+      triggers.forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+          const item = trigger.closest('[data-slot="accordion-item"]');
+          if (!item) return;
+
+          const content = item.querySelector('[data-slot="accordion-content"]');
+          if (!content) return;
+
+          const isOpen = trigger.getAttribute('data-state') === 'open';
+
+          // Handle single type: close others
+          if (type === 'single' && !isOpen) {
+            const allItems = accordion.querySelectorAll('[data-slot="accordion-item"]');
+            allItems.forEach((otherItem) => {
+              if (otherItem !== item) {
+                const otherTrigger = otherItem.querySelector('[data-slot="accordion-trigger"]');
+                const otherContent = otherItem.querySelector('[data-slot="accordion-content"]');
+                if (otherTrigger && otherContent) {
+                  otherTrigger.setAttribute('data-state', 'closed');
+                  otherContent.setAttribute('data-state', 'closed');
+                  otherContent.style.maxHeight = '0';
+                }
+              }
+            });
+          }
+
+          // Toggle current item
+          if (isOpen && (collapsible || type === 'multiple')) {
+            trigger.setAttribute('data-state', 'closed');
+            content.setAttribute('data-state', 'closed');
+            content.style.maxHeight = '0';
+          } else if (!isOpen) {
+            trigger.setAttribute('data-state', 'open');
+            content.setAttribute('data-state', 'open');
+            content.style.maxHeight = content.scrollHeight + 'px';
+          }
+        });
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initializeAccordions);
+  document.addEventListener('astro:page-load', initializeAccordions);
+</script>

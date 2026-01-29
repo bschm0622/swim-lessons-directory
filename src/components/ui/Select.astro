@@ -1,0 +1,154 @@
+---
+interface Props {
+  id?: string;
+  name?: string;
+  placeholder?: string;
+  defaultValue?: string;
+  class?: string;
+  disabled?: boolean;
+}
+
+const {
+  id,
+  name,
+  placeholder = "Select an option",
+  defaultValue,
+  class: className,
+  disabled = false
+} = Astro.props;
+
+const uniqueId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class="select-wrapper relative inline-block w-full" data-select-id={uniqueId}>
+  <input type="hidden" name={name} id={id} value={defaultValue || ''} />
+
+  <button
+    type="button"
+    disabled={disabled}
+    data-slot="select-trigger"
+    class:list={[
+      'h-9 w-full flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2 text-sm shadow-xs',
+      'bg-background text-foreground',
+      'transition-[color,box-shadow] outline-none whitespace-nowrap',
+      'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+      'disabled:cursor-not-allowed disabled:opacity-50',
+      className
+    ]}
+  >
+    <span class="select-value text-muted-foreground">{placeholder}</span>
+    <svg class="size-4 opacity-50 shrink-0 text-muted-foreground" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4.18179 6.18181C4.35753 6.00608 4.64245 6.00608 4.81819 6.18181L7.49999 8.86362L10.1818 6.18181C10.3575 6.00608 10.6424 6.00608 10.8182 6.18181C10.9939 6.35755 10.9939 6.64247 10.8182 6.81821L7.81819 9.81821C7.73379 9.9026 7.61934 9.95001 7.49999 9.95001C7.38064 9.95001 7.26618 9.9026 7.18179 9.81821L4.18179 6.81821C4.00605 6.64247 4.00605 6.35755 4.18179 6.18181Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"/>
+    </svg>
+  </button>
+
+  <div
+    class="select-content absolute z-50 hidden w-full min-w-[8rem] overflow-hidden rounded-md border border-input bg-background text-foreground shadow-md"
+    data-state="closed"
+  >
+    <div class="p-1 max-h-[300px] overflow-y-auto">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function initializeSelects() {
+    document.querySelectorAll('.select-wrapper').forEach(wrapper => {
+      // Skip if already initialized
+      if (wrapper.dataset.initialized) return;
+      wrapper.dataset.initialized = 'true';
+
+      const trigger = wrapper.querySelector('[data-slot="select-trigger"]');
+      const content = wrapper.querySelector('.select-content');
+      const valueDisplay = wrapper.querySelector('.select-value');
+      const hiddenInput = wrapper.querySelector('input[type="hidden"]');
+      const items = wrapper.querySelectorAll('[data-slot="select-item"]');
+
+      if (!trigger || !content) return;
+
+      // Toggle dropdown
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = content.getAttribute('data-state') === 'open';
+
+        if (isOpen) {
+          content.setAttribute('data-state', 'closed');
+          content.classList.add('hidden');
+        } else {
+          // Close all other selects FIRST
+          document.querySelectorAll('.select-content').forEach(c => {
+            if (c !== content) {
+              c.setAttribute('data-state', 'closed');
+              c.classList.add('hidden');
+            }
+          });
+
+          // Smart positioning
+          const rect = trigger.getBoundingClientRect();
+          const spaceBelow = window.innerHeight - rect.bottom;
+          const spaceAbove = rect.top;
+
+          content.classList.remove('top-full', 'bottom-full', 'mt-1', 'mb-1', 'hidden');
+
+          if (spaceBelow < 300 && spaceAbove > spaceBelow) {
+            content.classList.add('bottom-full', 'mb-1');
+          } else {
+            content.classList.add('top-full', 'mt-1');
+          }
+
+          content.setAttribute('data-state', 'open');
+        }
+      });
+
+      // Handle item clicks
+      items.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const value = item.getAttribute('data-value');
+          const text = item.textContent.trim();
+
+          // Update value
+          if (hiddenInput) hiddenInput.value = value;
+          if (valueDisplay) {
+            valueDisplay.textContent = text;
+            valueDisplay.classList.remove('text-muted-foreground');
+          }
+
+          // Update selected state
+          items.forEach(i => i.removeAttribute('data-selected'));
+          item.setAttribute('data-selected', 'true');
+
+          // Close dropdown
+          content.setAttribute('data-state', 'closed');
+          content.classList.add('hidden');
+        });
+      });
+
+      // Set initial value if defaultValue exists
+      const defaultValue = hiddenInput?.value;
+      if (defaultValue) {
+        const defaultItem = wrapper.querySelector(`[data-value="${defaultValue}"]`);
+        if (defaultItem) {
+          valueDisplay.textContent = defaultItem.textContent.trim();
+          valueDisplay.classList.remove('text-muted-foreground');
+          defaultItem.setAttribute('data-selected', 'true');
+        }
+      }
+    });
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initializeSelects);
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener('astro:page-load', initializeSelects);
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.select-content').forEach(content => {
+      content.setAttribute('data-state', 'closed');
+      content.classList.add('hidden');
+    });
+  });
+</script>

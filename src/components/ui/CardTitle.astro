@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const classes = `leading-none font-semibold ${className || ''}`;
+---
+
+<div
+  data-slot="card-title"
+  class={classes}
+>
+  <slot />
+</div>

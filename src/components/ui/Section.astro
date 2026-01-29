@@ -1,0 +1,29 @@
+---
+interface Props {
+  class?: string;
+  container?: boolean;
+  noPaddingTop?: boolean;
+  noPaddingBottom?: boolean;
+}
+
+const {
+  class: className,
+  container = true,
+  noPaddingTop = false,
+  noPaddingBottom = false
+} = Astro.props;
+
+const paddingY = !noPaddingTop && !noPaddingBottom
+  ? 'py-8 md:py-12'
+  : noPaddingTop && noPaddingBottom
+    ? ''
+    : noPaddingTop
+      ? 'pb-8 md:pb-12'
+      : 'pt-8 md:pt-12';
+
+const classes = `${container ? 'container mx-auto max-w-3xl' : ''} px-4 md:px-6 ${paddingY} ${className || ''}`;
+---
+
+<section class={classes}>
+  <slot />
+</section>
