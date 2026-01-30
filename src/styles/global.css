@@ -51,8 +51,7 @@
     --sidebar-ring: hsl(250 50% 25%);
 
     /* Fonts */
-    --font-sans: var(--font-ibm-plex-sans), system-ui, sans-serif;
-    --font-serif: var(--font-libre-baskerville), serif;
+    --font-sans: var(--font-parkinsans), system-ui, sans-serif;
     --font-mono: monospace;
 
     /* Shape + shadows */
@@ -122,8 +121,7 @@
     --sidebar-ring: hsl(250 55% 60%);
 
     /* Fonts */
-    --font-sans: var(--font-ibm-plex-sans), system-ui, sans-serif;
-    --font-serif: var(--font-libre-baskerville), serif;
+    --font-sans: var(--font-parkinsans), system-ui, sans-serif;
     --font-mono: monospace;
 
     /* Shape + shadows */
@@ -185,7 +183,7 @@
 
     --font-sans: var(--font-sans);
     --font-mono: var(--font-mono);
-    --font-serif: var(--font-serif);
+
 
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);

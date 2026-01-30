@@ -19,13 +19,8 @@ export default defineConfig({
     fonts: [
       {
         provider: fontProviders.fontsource(),
-        name: "IBM Plex Sans",
-        cssVariable: "--font-ibm-plex-sans"
-      },
-      {
-        provider: fontProviders.fontsource(),
-        name: "Libre Baskerville",
-        cssVariable: "--font-libre-baskerville"
+        name: "Parkinsans",
+        cssVariable: "--font-parkinsans"
       }
     ]
   }
