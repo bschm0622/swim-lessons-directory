@@ -1,0 +1,198 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Section from "@/components/ui/Section.astro";
+import Card from "@/components/ui/Card.astro";
+import CardHeader from "@/components/ui/CardHeader.astro";
+import CardTitle from "@/components/ui/CardTitle.astro";
+import CardDescription from "@/components/ui/CardDescription.astro";
+import CardContent from "@/components/ui/CardContent.astro";
+import Badge from "@/components/ui/Badge.astro";
+import Button from "@/components/ui/Button.astro";
+import allSchools from "@/data/swim-schools.json";
+
+export async function getStaticPaths() {
+	// Extract unique states
+	const stateMap = new Map();
+
+	allSchools.forEach(school => {
+		const addressParts = school.address.split(',').map(p => p.trim());
+		const stateWithZip = addressParts[addressParts.length - 2] || '';
+		const stateAbbrev = stateWithZip.split(' ')[0];
+
+		if (stateAbbrev) {
+			// Map state abbreviations to full names
+			const stateNames: Record<string, string> = {
+				'IN': 'Indiana',
+				'TX': 'Texas',
+				'CA': 'California',
+				'NY': 'New York',
+				'FL': 'Florida',
+				// Add more as needed
+			};
+
+			const stateName = stateNames[stateAbbrev] || stateAbbrev;
+			const stateSlug = stateName.toLowerCase().replace(/\s+/g, '-');
+
+			if (!stateMap.has(stateSlug)) {
+				stateMap.set(stateSlug, {
+					slug: stateSlug,
+					name: stateName,
+					abbrev: stateAbbrev,
+					schools: []
+				});
+			}
+
+			stateMap.get(stateSlug).schools.push(school);
+		}
+	});
+
+	return Array.from(stateMap.values()).map(state => ({
+		params: { state: state.slug },
+		props: { state }
+	}));
+}
+
+const { state } = Astro.props;
+
+// Group schools by city
+const citiesMap = new Map();
+
+state.schools.forEach(school => {
+	const addressParts = school.address.split(',').map(p => p.trim());
+	const city = addressParts[addressParts.length - 3] || 'Unknown';
+
+	if (!citiesMap.has(city)) {
+		citiesMap.set(city, []);
+	}
+	citiesMap.get(city).push(school);
+});
+
+const cities = Array.from(citiesMap.entries()).map(([name, schools]) => ({
+	name,
+	slug: name.toLowerCase().replace(/\s+/g, '-'),
+	schools,
+	topRated: schools.sort((a, b) => b.rating - a.rating).slice(0, 3)
+})).sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<Layout
+	title={`Swim Lessons in ${state.name} - Find the Best Programs`}
+	description={`Discover ${state.schools.length} swim schools across ${cities.length} cities in ${state.name}. Compare programs, read reviews, and find the perfect swim lessons for your family.`}
+>
+	<!-- Hero Section -->
+	<div class="relative min-h-[500px] bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 flex items-center">
+		<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSJyZ2JhKDAsIDE1MCwgMjAwLCAwLjA1KSIvPjwvZz48L3N2Zz4=')] opacity-50"></div>
+
+		<Section class="relative z-10 py-20">
+			<div class="max-w-4xl">
+				<!-- Breadcrumb -->
+				<nav class="mb-8 text-sm">
+					<ol class="flex items-center gap-2">
+						<li><a href="/" class="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
+						<li class="text-muted-foreground">/</li>
+						<li class="text-foreground font-medium">{state.name}</li>
+					</ol>
+				</nav>
+
+				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
+					Swim Lessons in <span class="text-primary">{state.name}</span>
+				</h1>
+
+				<p class="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
+					Discover {state.schools.length} top-rated swim programs across {cities.length} {cities.length === 1 ? 'city' : 'cities'}
+				</p>
+
+				<!-- Stats -->
+				<div class="flex flex-wrap gap-4">
+					<div class="bg-card/80 backdrop-blur-sm border-2 border-primary/20 rounded-xl px-6 py-4 hover:border-primary/40 transition-colors">
+						<div class="text-3xl font-bold text-primary">{state.schools.length}</div>
+						<div class="text-sm text-muted-foreground font-medium">Programs</div>
+					</div>
+					<div class="bg-card/80 backdrop-blur-sm border-2 border-primary/20 rounded-xl px-6 py-4 hover:border-primary/40 transition-colors">
+						<div class="text-3xl font-bold text-primary">{cities.length}</div>
+						<div class="text-sm text-muted-foreground font-medium">{cities.length === 1 ? 'City' : 'Cities'}</div>
+					</div>
+					<div class="bg-card/80 backdrop-blur-sm border-2 border-secondary/20 rounded-xl px-6 py-4 hover:border-secondary/40 transition-colors">
+						<div class="text-3xl font-bold text-secondary">
+							{state.schools.filter(s => s.rating >= 4.5).length}
+						</div>
+						<div class="text-sm text-muted-foreground font-medium">Top Rated (4.5+)</div>
+					</div>
+				</div>
+			</div>
+		</Section>
+	</div>
+
+	<!-- Cities Section -->
+	<Section class="py-16 bg-background">
+		<h2 class="text-3xl font-bold mb-8">Browse by City</h2>
+
+		<div class="space-y-12">
+			{cities.map(city => (
+				<div>
+					<div class="flex items-center justify-between mb-6">
+						<div>
+							<h3 class="text-2xl font-bold text-foreground">{city.name}</h3>
+							<p class="text-muted-foreground">{city.schools.length} {city.schools.length === 1 ? 'program' : 'programs'}</p>
+						</div>
+						<Button variant="outline" href={`/${state.slug}/${city.slug}`}>
+							View All in {city.name}
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M5 12h14"></path>
+								<path d="m12 5 7 7-7 7"></path>
+							</svg>
+						</Button>
+					</div>
+
+					<div class="grid md:grid-cols-3 gap-6">
+						{city.topRated.map(school => (
+							<Card class="hover:shadow-lg transition-shadow">
+								<CardHeader>
+									<div class="flex items-start justify-between mb-2">
+										<div class="text-3xl">🏊‍♀️</div>
+										{school.rating > 0 && (
+											<Badge variant="secondary" class="text-xs">
+												⭐ {school.rating.toFixed(1)}
+											</Badge>
+										)}
+									</div>
+									<CardTitle>
+										<a href={`/${state.slug}/${city.slug}/${school.id}`} class="hover:text-primary transition-colors">
+											{school.name}
+										</a>
+									</CardTitle>
+									<CardDescription class="mt-2">
+										{school.categories.slice(0, 2).map(cat => (
+											<Badge variant="outline" class="text-xs mr-1 mb-1">
+												{cat}
+											</Badge>
+										))}
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<p class="text-sm text-muted-foreground line-clamp-2 mb-3">
+										{school.shortDescription}
+									</p>
+									<Button variant="outline" href={`/${state.slug}/${city.slug}/${school.id}`} class="w-full">
+										View Details
+									</Button>
+								</CardContent>
+							</Card>
+						))}
+					</div>
+
+					{city.schools.length > 3 && (
+						<div class="mt-4 text-center">
+							<a
+								href={`/${state.slug}/${city.slug}`}
+								class="text-primary hover:underline text-sm font-medium"
+							>
+								+ {city.schools.length - 3} more in {city.name}
+							</a>
+						</div>
+					)}
+				</div>
+			))}
+		</div>
+	</Section>
+</Layout>

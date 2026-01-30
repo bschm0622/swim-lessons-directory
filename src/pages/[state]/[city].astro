@@ -1,0 +1,241 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Section from "@/components/ui/Section.astro";
+import Card from "@/components/ui/Card.astro";
+import CardHeader from "@/components/ui/CardHeader.astro";
+import CardTitle from "@/components/ui/CardTitle.astro";
+import CardDescription from "@/components/ui/CardDescription.astro";
+import CardContent from "@/components/ui/CardContent.astro";
+import Badge from "@/components/ui/Badge.astro";
+import Button from "@/components/ui/Button.astro";
+import allSchools from "@/data/swim-schools.json";
+
+export async function getStaticPaths() {
+	// Extract unique state/city combinations
+	const cityMap = new Map();
+
+	allSchools.forEach(school => {
+		const addressParts = school.address.split(',').map(p => p.trim());
+		const city = addressParts[addressParts.length - 3] || '';
+		const stateWithZip = addressParts[addressParts.length - 2] || '';
+		const stateAbbrev = stateWithZip.split(' ')[0];
+
+		if (city && stateAbbrev) {
+			// Map state abbreviations to full names
+			const stateNames: Record<string, string> = {
+				'IN': 'Indiana',
+				'TX': 'Texas',
+				'CA': 'California',
+				'NY': 'New York',
+				'FL': 'Florida',
+				// Add more as needed
+			};
+
+			const stateName = stateNames[stateAbbrev] || stateAbbrev;
+			const stateSlug = stateName.toLowerCase().replace(/\s+/g, '-');
+			const citySlug = city.toLowerCase().replace(/\s+/g, '-');
+			const key = `${stateSlug}/${citySlug}`;
+
+			if (!cityMap.has(key)) {
+				cityMap.set(key, {
+					stateName,
+					stateSlug,
+					stateAbbrev,
+					cityName: city,
+					citySlug,
+					schools: []
+				});
+			}
+
+			cityMap.get(key).schools.push(school);
+		}
+	});
+
+	return Array.from(cityMap.values()).map(cityData => ({
+		params: { state: cityData.stateSlug, city: cityData.citySlug },
+		props: { cityData }
+	}));
+}
+
+const { cityData } = Astro.props;
+
+// Sort schools by rating
+const schools = cityData.schools.sort((a, b) => b.rating - a.rating);
+
+// Extract unique categories from these schools
+const allCategories = new Set<string>();
+schools.forEach(school => {
+	school.categories.forEach(cat => allCategories.add(cat));
+});
+const categories = Array.from(allCategories);
+---
+
+<Layout
+	title={`Swim Lessons in ${cityData.cityName}, ${cityData.stateAbbrev} - ${schools.length} Programs`}
+	description={`Find the best swim lessons in ${cityData.cityName}, ${cityData.stateName}. Compare ${schools.length} programs, read reviews, and choose the perfect swim school for your family.`}
+>
+	<!-- Hero Section -->
+	<div class="relative min-h-[500px] bg-gradient-to-br from-secondary/20 via-primary/10 to-accent/20 flex items-center">
+		<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSJyZ2JhKDAsIDE1MCwgMjAwLCAwLjA1KSIvPjwvZz48L3N2Zz4=')] opacity-50"></div>
+
+		<Section class="relative z-10 py-20">
+			<div class="max-w-5xl">
+				<!-- Breadcrumb -->
+				<nav class="mb-8 text-sm">
+					<ol class="flex items-center gap-2 flex-wrap">
+						<li><a href="/" class="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
+						<li class="text-muted-foreground">/</li>
+						<li><a href={`/${cityData.stateSlug}`} class="text-muted-foreground hover:text-primary transition-colors">{cityData.stateName}</a></li>
+						<li class="text-muted-foreground">/</li>
+						<li class="text-foreground font-medium">{cityData.cityName}</li>
+					</ol>
+				</nav>
+
+				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
+					Best Swim Lessons in <span class="text-primary">{cityData.cityName}</span>
+				</h1>
+
+				<p class="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-3xl">
+					Compare {schools.length} top-rated swim {schools.length === 1 ? 'program' : 'programs'} and find the perfect fit for your family
+				</p>
+
+				<!-- Stats -->
+				<div class="flex flex-wrap gap-4 mb-8">
+					<div class="bg-card/80 backdrop-blur-sm border-2 border-primary/20 rounded-xl px-6 py-4 hover:border-primary/40 transition-colors">
+						<div class="text-3xl font-bold text-primary">{schools.length}</div>
+						<div class="text-sm text-muted-foreground font-medium">Programs</div>
+					</div>
+					<div class="bg-card/80 backdrop-blur-sm border-2 border-secondary/20 rounded-xl px-6 py-4 hover:border-secondary/40 transition-colors">
+						<div class="text-3xl font-bold text-secondary">
+							{schools.filter(s => s.rating >= 4.5).length}
+						</div>
+						<div class="text-sm text-muted-foreground font-medium">Top Rated (4.5+)</div>
+					</div>
+					<div class="bg-card/80 backdrop-blur-sm border-2 border-accent/20 rounded-xl px-6 py-4 hover:border-accent/40 transition-colors">
+						<div class="text-3xl font-bold text-accent">{categories.length}</div>
+						<div class="text-sm text-muted-foreground font-medium">Specialties</div>
+					</div>
+				</div>
+
+				{categories.length > 0 && (
+					<div>
+						<p class="text-sm font-medium text-muted-foreground mb-3">Available Programs:</p>
+						<div class="flex flex-wrap gap-2">
+							{categories.map(cat => (
+								<Badge variant="outline" class="text-sm">{cat}</Badge>
+							))}
+						</div>
+					</div>
+				)}
+			</div>
+		</Section>
+	</div>
+
+	<!-- Schools Grid -->
+	<Section class="py-16 bg-background">
+		<h2 class="text-3xl font-bold mb-8">All Swim Programs in {cityData.cityName}</h2>
+
+		<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{schools.map(school => (
+				<Card class="hover:shadow-xl transition-shadow">
+					<CardHeader>
+						<div class="flex items-start justify-between mb-3">
+							<div class="text-4xl">
+								{school.specialFeatures.includes('On-Site Childcare') ? '👨‍👩‍👧' : '🏊‍♀️'}
+							</div>
+							{school.rating > 0 && (
+								<Badge variant="secondary" class="text-xs">
+									⭐ {school.rating.toFixed(1)}
+								</Badge>
+							)}
+						</div>
+						<CardTitle>
+							<a href={`/${cityData.stateSlug}/${cityData.citySlug}/${school.id}`} class="hover:text-primary transition-colors">
+								{school.name}
+							</a>
+						</CardTitle>
+						<CardDescription>
+							<div class="mt-2 mb-3">
+								<div class="text-xs text-muted-foreground mb-2">{school.facilityType}</div>
+								<div class="flex flex-wrap gap-1">
+									{school.categories.slice(0, 2).map(cat => (
+										<Badge variant="outline" class="text-xs">
+											{cat}
+										</Badge>
+									))}
+									{school.categories.length > 2 && (
+										<Badge variant="outline" class="text-xs">
+											+{school.categories.length - 2}
+										</Badge>
+									)}
+								</div>
+							</div>
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<p class="text-sm text-muted-foreground mb-4 line-clamp-3">
+							{school.shortDescription}
+						</p>
+
+						<!-- Quick Info -->
+						<div class="space-y-2 mb-4 text-xs">
+							{school.phone && (
+								<div class="flex items-center gap-2 text-muted-foreground">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+									</svg>
+									{school.phone}
+								</div>
+							)}
+							{school.priceTier && school.priceTier !== 'Not Specified' && (
+								<div class="flex items-center gap-2 text-muted-foreground">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<line x1="12" x2="12" y1="2" y2="22"></line>
+										<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+									</svg>
+									{school.priceTier}
+								</div>
+							)}
+							{school.hours && (
+								<div class="flex items-center gap-2 text-muted-foreground">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<circle cx="12" cy="12" r="10"></circle>
+										<polyline points="12 6 12 12 16 14"></polyline>
+									</svg>
+									{school.hours}
+								</div>
+							)}
+						</div>
+
+						<Button variant="outline" href={`/${cityData.stateSlug}/${cityData.citySlug}/${school.id}`} class="w-full">
+							View Details
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M5 12h14"></path>
+								<path d="m12 5 7 7-7 7"></path>
+							</svg>
+						</Button>
+					</CardContent>
+				</Card>
+			))}
+		</div>
+	</Section>
+
+	<!-- CTA Section -->
+	<Section class="py-16 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
+		<div class="max-w-3xl mx-auto text-center">
+			<h2 class="text-3xl md:text-4xl font-bold mb-4">
+				Can't Find What You're Looking For?
+			</h2>
+			<p class="text-lg text-muted-foreground mb-6">
+				We're constantly adding new swim programs. Check back soon or explore other cities in {cityData.stateName}.
+			</p>
+			<Button size="lg" variant="outline" href={`/${cityData.stateSlug}`}>
+				Browse All {cityData.stateName} Programs
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M5 12h14"></path>
+					<path d="m12 5 7 7-7 7"></path>
+				</svg>
+			</Button>
+		</div>
+	</Section>
+</Layout>

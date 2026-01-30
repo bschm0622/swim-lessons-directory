@@ -20,7 +20,9 @@ export default defineConfig({
       {
         provider: fontProviders.fontsource(),
         name: "Parkinsans",
-        cssVariable: "--font-parkinsans"
+        cssVariable: "--font-parkinsans",
+        weights: [300, 400, 500, 600, 700, 800],
+        styles: ["normal"]
       }
     ]
   }

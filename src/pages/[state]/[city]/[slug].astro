@@ -1,0 +1,284 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Section from "@/components/ui/Section.astro";
+import Badge from "@/components/ui/Badge.astro";
+import Button from "@/components/ui/Button.astro";
+import Card from "@/components/ui/Card.astro";
+import CardHeader from "@/components/ui/CardHeader.astro";
+import CardTitle from "@/components/ui/CardTitle.astro";
+import CardDescription from "@/components/ui/CardDescription.astro";
+import CardContent from "@/components/ui/CardContent.astro";
+import allSchools from "@/data/swim-schools.json";
+import { marked } from "marked";
+
+export async function getStaticPaths() {
+	const paths = [];
+
+	allSchools.forEach(school => {
+		const addressParts = school.address.split(',').map(p => p.trim());
+		const city = addressParts[addressParts.length - 3] || '';
+		const stateWithZip = addressParts[addressParts.length - 2] || '';
+		const stateAbbrev = stateWithZip.split(' ')[0];
+
+		if (city && stateAbbrev) {
+			const stateNames = {
+				'IN': 'Indiana',
+				'TX': 'Texas',
+				'CA': 'California',
+				'NY': 'New York',
+				'FL': 'Florida',
+			};
+
+			const stateName = stateNames[stateAbbrev] || stateAbbrev;
+			const stateSlug = stateName.toLowerCase().replace(/\s+/g, '-');
+			const citySlug = city.toLowerCase().replace(/\s+/g, '-');
+
+			paths.push({
+				params: {
+					state: stateSlug,
+					city: citySlug,
+					slug: school.id
+				},
+				props: { school, city, stateAbbrev, stateName, stateSlug, citySlug }
+			});
+		}
+	});
+
+	return paths;
+}
+
+const { school, city, stateAbbrev, stateName, stateSlug, citySlug } = Astro.props;
+
+// Parse markdown summary (GFM is enabled by default in marked v17)
+const summaryHtml = school.summary ? marked(school.summary, { gfm: true, breaks: true }) : '';
+
+// Get related schools in the same city
+const relatedSchools = allSchools
+	.filter(s => s.id !== school.id && s.address.includes(city))
+	.sort((a, b) => b.rating - a.rating)
+	.slice(0, 3);
+---
+
+<Layout
+	title={`${school.name} - ${city}, ${stateAbbrev} | Swim Lessons`}
+	description={school.shortDescription || `Swim lessons at ${school.name} in ${city}, ${stateAbbrev}. ${school.categories.join(', ')}.`}
+>
+	<!-- Hero Section -->
+		<Section class="relative z-10">
+			<!-- Breadcrumb -->
+			<nav class="mb-8 text-sm">
+				<ol class="flex items-center gap-2 flex-wrap">
+					<li><a href="/" class="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
+					<li class="text-muted-foreground">/</li>
+					<li><a href={`/${stateSlug}`} class="text-muted-foreground hover:text-primary transition-colors">{stateName}</a></li>
+					<li class="text-muted-foreground">/</li>
+					<li><a href={`/${stateSlug}/${citySlug}`} class="text-muted-foreground hover:text-primary transition-colors">{city}</a></li>
+					<li class="text-muted-foreground">/</li>
+					<li class="text-foreground font-medium">{school.name}</li>
+				</ol>
+			</nav>
+
+			<div class="max-w-4xl mx-auto">
+				<!-- Title & Rating -->
+				<div class="mb-6">
+					{school.rating > 0 && (
+						<div class="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1 rounded-full mb-4">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+								<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+							</svg>
+							<span class="font-bold">{school.rating.toFixed(1)}</span>
+							<span class="text-sm">Rating</span>
+						</div>
+					)}
+					<h1 class="text-4xl md:text-5xl font-bold mb-3 text-foreground leading-tight">
+						{school.name}
+					</h1>
+					<p class="text-xl text-muted-foreground mb-4">{school.facilityType}</p>
+
+					{school.shortDescription && (
+						<p class="text-lg text-muted-foreground leading-relaxed">
+							{school.shortDescription}
+						</p>
+					)}
+				</div>
+
+				<!-- Categories -->
+				{school.categories.length > 0 && (
+					<div class="flex flex-wrap gap-2 mb-8">
+						{school.categories.map(cat => (
+							<Badge variant="outline" class="text-sm">{cat}</Badge>
+						))}
+					</div>
+				)}
+
+				<!-- Basic Contact Info (non-clickable) -->
+				<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12 text-sm">
+					{school.address && (
+						<div class="flex items-center gap-2">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary shrink-0">
+								<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+								<circle cx="12" cy="10" r="3"></circle>
+							</svg>
+							<span class="text-muted-foreground">{city}, {stateAbbrev}</span>
+						</div>
+					)}
+					{school.phone && (
+						<div class="flex items-center gap-2">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary shrink-0">
+								<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+							</svg>
+							<span class="text-muted-foreground">{school.phone}</span>
+						</div>
+					)}
+					{school.hours && (
+						<div class="flex items-center gap-2">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary shrink-0">
+								<circle cx="12" cy="12" r="10"></circle>
+								<polyline points="12 6 12 12 16 14"></polyline>
+							</svg>
+							<span class="text-muted-foreground">{school.hours}</span>
+						</div>
+					)}
+					{school.priceTier && school.priceTier !== 'Not Specified' && (
+						<div class="flex items-center gap-2">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary shrink-0">
+								<line x1="12" x2="12" y1="2" y2="22"></line>
+								<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+							</svg>
+							<span class="text-muted-foreground">{school.priceTier}</span>
+						</div>
+					)}
+				</div>
+
+				<!-- About Section (Main Description) -->
+				{summaryHtml && (
+					<div class="mb-12">
+						<h2 class="text-3xl font-bold mb-6 text-foreground">About {school.name}</h2>
+						<div class="typography" set:html={summaryHtml} />
+					</div>
+				)}
+			</div>
+		</Section>
+
+	<!-- Special Features -->
+	{school.specialFeatures.length > 0 && school.specialFeatures[0] !== 'Not Specified' && (
+		<Section class="py-12 bg-muted/30">
+			<div class="max-w-4xl mx-auto">
+				<h2 class="text-2xl font-bold mb-6">What Makes Us Special</h2>
+				<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+					{school.specialFeatures.map(feature => (
+						<div class="flex items-center gap-3 bg-card p-4 rounded-lg border hover:border-primary/50 transition-colors">
+							<div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
+								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
+									<polyline points="20 6 9 17 4 12"></polyline>
+								</svg>
+							</div>
+							<span class="font-medium">{feature}</span>
+						</div>
+					))}
+				</div>
+			</div>
+		</Section>
+	)}
+
+	<!-- Contact CTA Section (moved down) -->
+	<Section class="py-12 bg-background">
+		<div class="max-w-3xl mx-auto">
+			<Card class="p-8 text-center bg-gradient-to-br from-primary/5 to-accent/5 border-2">
+				<h3 class="text-2xl font-bold mb-4">Ready to Get Started?</h3>
+				<p class="text-muted-foreground mb-6">Contact {school.name} to learn more about their programs and schedule</p>
+
+				<div class="flex flex-wrap gap-3 justify-center">
+					{school.phone && (
+						<Button size="lg" href={`tel:${school.phone}`}>
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+							</svg>
+							Call {school.phone}
+						</Button>
+					)}
+					{school.coordinates.lat !== 0 && school.coordinates.lng !== 0 && (
+						<Button
+							size="lg"
+							variant="outline"
+							href={`https://www.google.com/maps/search/?api=1&query=${school.coordinates.lat},${school.coordinates.lng}`}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+								<circle cx="12" cy="10" r="3"></circle>
+							</svg>
+							Get Directions
+						</Button>
+					)}
+					{school.website && (
+						<Button size="lg" variant="outline" href={school.website} target="_blank" rel="noopener noreferrer">
+							Visit Website
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+								<polyline points="15 3 21 3 21 9"></polyline>
+								<line x1="10" x2="21" y1="14" y2="3"></line>
+							</svg>
+						</Button>
+					)}
+				</div>
+			</Card>
+		</div>
+	</Section>
+
+			<div class="max-w-5xl mx-auto">
+			<div class="flex items-center justify-between mb-8">
+				<div>
+					<h2 class="text-3xl font-bold">More Options in {city}</h2>
+					<p class="text-muted-foreground mt-2">Other highly-rated swim programs nearby</p>
+				</div>
+				<Button variant="outline" href={`/${stateSlug}/${citySlug}`}>
+					View All
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M5 12h14"></path>
+						<path d="m12 5 7 7-7 7"></path>
+					</svg>
+				</Button>
+			</div>
+
+			<div class="grid md:grid-cols-3 gap-6">
+				{relatedSchools.map(related => (
+					<Card class="hover:shadow-xl transition-all hover:-translate-y-1">
+						<CardHeader>
+							<div class="flex items-start justify-between mb-2">
+								<div class="text-4xl">🏊‍♀️</div>
+								{related.rating > 0 && (
+									<Badge variant="secondary" class="text-xs">
+										⭐ {related.rating.toFixed(1)}
+									</Badge>
+								)}
+							</div>
+							<CardTitle>
+								<a href={`/${stateSlug}/${citySlug}/${related.id}`} class="hover:text-primary transition-colors">
+									{related.name}
+								</a>
+							</CardTitle>
+							<CardDescription class="mt-2">
+								{related.categories.slice(0, 2).map(cat => (
+									<Badge variant="outline" class="text-xs mr-1 mb-1">
+										{cat}
+									</Badge>
+								))}
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<p class="text-sm text-muted-foreground line-clamp-3 mb-4">
+								{related.shortDescription}
+							</p>
+							<Button variant="outline" href={`/${stateSlug}/${citySlug}/${related.id}`} class="w-full">
+								View Details
+							</Button>
+						</CardContent>
+					</Card>
+				))}
+			</div>
+			</div>
+		</Section>
+	)}
+</Layout>

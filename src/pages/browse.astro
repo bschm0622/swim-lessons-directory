@@ -1,0 +1,129 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Section from "@/components/ui/Section.astro";
+import Card from "@/components/ui/Card.astro";
+import CardHeader from "@/components/ui/CardHeader.astro";
+import CardTitle from "@/components/ui/CardTitle.astro";
+import CardDescription from "@/components/ui/CardDescription.astro";
+import CardContent from "@/components/ui/CardContent.astro";
+import Button from "@/components/ui/Button.astro";
+import allSchools from "@/data/swim-schools.json";
+
+// Extract unique states with school counts
+const stateMap = new Map();
+
+allSchools.forEach(school => {
+	const addressParts = school.address.split(',').map(p => p.trim());
+	const stateWithZip = addressParts[addressParts.length - 2] || '';
+	const stateAbbrev = stateWithZip.split(' ')[0];
+
+	if (stateAbbrev) {
+		const stateNames: Record<string, string> = {
+			'IN': 'Indiana',
+			'TX': 'Texas',
+			'CA': 'California',
+			'NY': 'New York',
+			'FL': 'Florida',
+		};
+
+		const stateName = stateNames[stateAbbrev] || stateAbbrev;
+		const stateSlug = stateName.toLowerCase().replace(/\s+/g, '-');
+
+		if (!stateMap.has(stateSlug)) {
+			stateMap.set(stateSlug, {
+				name: stateName,
+				abbrev: stateAbbrev,
+				slug: stateSlug,
+				schoolCount: 0,
+				cities: new Set()
+			});
+		}
+
+		const state = stateMap.get(stateSlug);
+		state.schoolCount++;
+
+		const city = addressParts[addressParts.length - 3] || '';
+		if (city) {
+			state.cities.add(city);
+		}
+	}
+});
+
+const states = Array.from(stateMap.values())
+	.map(state => ({
+		...state,
+		cityCount: state.cities.size
+	}))
+	.sort((a, b) => b.schoolCount - a.schoolCount);
+---
+
+<Layout
+	title="Browse All Swim Lessons by State"
+	description={`Find swim lessons across ${states.length} states. Browse by location to discover the perfect program for your family.`}
+>
+	<!-- Hero Section -->
+	<Section class="pt-24 pb-12 bg-gradient-to-b from-primary/10 to-background">
+		<div class="max-w-4xl mx-auto text-center">
+			<h1 class="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+				Browse Swim Programs by Location
+			</h1>
+			<p class="text-xl text-muted-foreground mb-6">
+				Explore {allSchools.length} swim schools across {states.length} {states.length === 1 ? 'state' : 'states'}
+			</p>
+		</div>
+	</Section>
+
+	<!-- States Grid -->
+	<Section class="py-16 bg-background">
+		<h2 class="text-3xl font-bold mb-8">Browse by State</h2>
+
+		<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{states.map(state => (
+				<Card class="hover:shadow-lg transition-shadow group">
+					<CardHeader>
+						<div class="flex items-center justify-between mb-2">
+							<CardTitle class="group-hover:text-primary transition-colors">
+								{state.name}
+							</CardTitle>
+							<div class="text-2xl">{state.abbrev === 'IN' ? '🏀' : state.abbrev === 'TX' ? '🤠' : state.abbrev === 'CA' ? '🌴' : state.abbrev === 'NY' ? '🗽' : state.abbrev === 'FL' ? '🌊' : '📍'}</div>
+						</div>
+						<CardDescription>
+							<div class="flex gap-4 text-sm">
+								<div>
+									<span class="font-semibold text-foreground">{state.schoolCount}</span> {state.schoolCount === 1 ? 'program' : 'programs'}
+								</div>
+								<div>
+									<span class="font-semibold text-foreground">{state.cityCount}</span> {state.cityCount === 1 ? 'city' : 'cities'}
+								</div>
+							</div>
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<Button variant="outline" href={`/${state.slug}`} class="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+							Browse {state.name}
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M5 12h14"></path>
+								<path d="m12 5 7 7-7 7"></path>
+							</svg>
+						</Button>
+					</CardContent>
+				</Card>
+			))}
+		</div>
+	</Section>
+
+	<!-- CTA Section -->
+	<Section class="py-16 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
+		<div class="max-w-3xl mx-auto text-center">
+			<h2 class="text-3xl md:text-4xl font-bold mb-4">
+				Can't Find Your Location?
+			</h2>
+			<p class="text-lg text-muted-foreground mb-6">
+				We're constantly expanding our directory. Check back soon for more locations.
+			</p>
+			<Button size="lg" variant="outline" href="/">
+				Back to Home
+			</Button>
+		</div>
+	</Section>
+</Layout>

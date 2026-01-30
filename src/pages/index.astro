@@ -3,24 +3,122 @@ import Layout from "@/layouts/Layout.astro";
 import Badge from "@/components/ui/Badge.astro";
 import Button from "@/components/ui/Button.astro";
 import Section from "@/components/ui/Section.astro";
+import Card from "@/components/ui/Card.astro";
+import CardHeader from "@/components/ui/CardHeader.astro";
+import CardTitle from "@/components/ui/CardTitle.astro";
+import CardDescription from "@/components/ui/CardDescription.astro";
+import CardContent from "@/components/ui/CardContent.astro";
+import CardFooter from "@/components/ui/CardFooter.astro";
+import Input from "@/components/ui/Input.astro";
+import allSchools from "@/data/swim-schools.json";
+
+// Get top-rated schools for featured section (4.5+ rating)
+const featuredSchools = allSchools
+	.filter(school => school.rating >= 4.5)
+	.sort((a, b) => b.rating - a.rating)
+	.slice(0, 4);
+
+// Extract unique categories from all schools
+const categoryIcons: Record<string, string> = {
+	"Parent & Child": "👶",
+	"Survival-First": "🛟",
+	"Adult & Teen": "👨‍🦱",
+	"Private / Semi-Private": "🏊‍♂️",
+	"Competitive / Clinics": "🏅",
+	"Adaptive / Special Needs": "💙",
+	"Mobile / At-Home": "🚗",
+};
+
+const colorRotation = [
+	"bg-accent/10 text-accent-foreground",
+	"bg-primary/10 text-primary",
+	"bg-secondary/10 text-secondary-foreground",
+];
+
+const allCategories = new Set<string>();
+allSchools.forEach(school => {
+	school.categories.forEach(cat => allCategories.add(cat));
+});
+
+const categories = Array.from(allCategories).map((name, i) => ({
+	name,
+	icon: categoryIcons[name] || "🏊",
+	color: colorRotation[i % colorRotation.length]
+}));
 ---
 
-<Layout title="Home" description="Home Page">
-	<div
-		class="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
-	>
+<Layout title="Find Specialty Swim Lessons Near You" description="Discover the perfect swim program for your family">
+	<!-- Hero Section with Background Image -->
+	<div class="relative min-h-[600px] flex items-center justify-center overflow-hidden">
+		<!-- Background Image from Unsplash -->
+		<div class="absolute inset-0">
+			<img
+				src="https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?auto=format&fit=crop&w=1920&q=80"
+				alt="Child learning to swim"
+				class="w-full h-full object-cover"
+			/>
+		</div>
+
+		<!-- Dark overlay for text readability -->
+		<div class="absolute inset-0 bg-gradient-to-b from-foreground/50 via-foreground/40 to-foreground/60"></div>
+
 		<!-- Content -->
-		<Section
-			container={false}
-			class="text-center"
-		>
-			<!-- Badge -->
-			<div class="flex justify-center mb-6">
-				<Badge variant="outline" class="gap-2">
+		<div class="relative z-10 w-full max-w-6xl mx-auto px-4 py-20 text-center">
+
+			<!-- Heading -->
+			<h1 class="text-5xl md:text-7xl font-semibold mb-6 text-white leading-tight drop-shadow-lg">
+				Find the Perfect<br />
+				<span class="font-extrabold text-secondary">Swim Lessons</span> for Your Family
+			</h1>
+
+			<!-- Description -->
+			<p class="text-xl md:text-2xl text-white/95 mb-12 max-w-3xl mx-auto drop-shadow-md">
+				From infant water safety to competitive training, discover specialty swim programs
+				tailored to your child's needs.
+			</p>
+
+			<!-- Search Bar Overlay -->
+			<div class="max-w-3xl mx-auto mb-8">
+				<div class="bg-card shadow-2xl">
+					<div class="relative">
+						<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="text-muted-foreground"
+							>
+								<circle cx="11" cy="11" r="8"></circle>
+								<path d="m21 21-4.3-4.3"></path>
+							</svg>
+						</div>
+						<Input
+							type="text"
+							placeholder="Search by location, specialty, or program name..."
+							class="h-16 pl-14 pr-32 text-lg border-0 focus:ring-2 focus:ring-primary"
+						/>
+						<div class="absolute inset-y-0 right-2 flex items-center">
+							<Button size="lg" class="h-12 px-8 text-base">
+								Search
+							</Button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Quick Stats -->
+			<div class="flex items-center justify-center gap-6 md:gap-10 text-sm md:text-base text-white/90 flex-wrap">
+				<div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
+						width="18"
+						height="18"
 						viewBox="0 0 24 24"
 						fill="none"
 						stroke="currentColor"
@@ -28,29 +126,265 @@ import Section from "@/components/ui/Section.astro";
 						stroke-linecap="round"
 						stroke-linejoin="round"
 					>
-						<path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-						<path d="M2 17l10 5 10-5"></path>
-						<path d="M2 12l10 5 10-5"></path>
+						<polyline points="20 6 9 17 4 12"></polyline>
 					</svg>
-					Astro Components
-				</Badge>
+					<span class="font-medium">{allSchools.length} Programs</span>
+				</div>
+				<div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<polyline points="20 6 9 17 4 12"></polyline>
+					</svg>
+					<span class="font-medium">Safety Certified</span>
+				</div>
+				<div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<polyline points="20 6 9 17 4 12"></polyline>
+					</svg>
+					<span class="font-medium">Verified Reviews</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Categories Section -->
+	<Section class="py-16 bg-background">
+		<div class="text-center mb-12">
+			<h2 class="text-3xl md:text-4xl font-bold mb-4 text-foreground">Browse by Specialty</h2>
+			<p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+				Find the right program for every age and skill level
+			</p>
+		</div>
+
+		<div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+			{categories.map((category) => (
+				<button class={`${category.color} rounded-xl p-6 text-center hover:scale-105 transition-transform border border-border/50 hover:border-primary/30 hover:shadow-md`}>
+					<div class="text-4xl mb-3">{category.icon}</div>
+					<div class="font-medium text-sm">{category.name}</div>
+				</button>
+			))}
+		</div>
+	</Section>
+
+	<!-- Featured Schools Section -->
+	<Section class="py-16 bg-muted/30">
+		<div class="text-center mb-12">
+			<h2 class="text-3xl md:text-4xl font-bold mb-4 text-foreground">Featured Swim Programs</h2>
+			<p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+				Top-rated programs recommended by families in your area
+			</p>
+		</div>
+
+		<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+			{featuredSchools.map((school) => {
+				const addressParts = school.address.split(',').map(p => p.trim());
+				const city = addressParts[addressParts.length - 3] || 'Indianapolis';
+				const stateAbbrev = addressParts[addressParts.length - 2]?.split(' ')[0] || 'IN';
+
+				const stateNames = {
+					'IN': 'Indiana',
+					'TX': 'Texas',
+					'CA': 'California',
+					'NY': 'New York',
+					'FL': 'Florida',
+				};
+
+				const stateName = stateNames[stateAbbrev] || stateAbbrev;
+				const stateSlug = stateName.toLowerCase().replace(/\s+/g, '-');
+				const citySlug = city.toLowerCase().replace(/\s+/g, '-');
+				const emoji = school.specialFeatures.includes('On-Site Childcare') ? '👨‍👩‍👧' : '🏊‍♀️';
+
+				return (
+				<Card class="hover:shadow-xl transition-shadow cursor-pointer group">
+					<CardHeader>
+						<div class="flex items-start justify-between mb-3">
+							<div class="text-5xl">{emoji}</div>
+							<Badge variant="secondary" class="text-xs">
+								⭐ {school.rating.toFixed(1)}
+							</Badge>
+						</div>
+						<CardTitle class="group-hover:text-primary transition-colors">
+							<a href={`/${stateSlug}/${citySlug}/${school.id}`}>
+								{school.name}
+							</a>
+						</CardTitle>
+						<CardDescription>
+							<div class="flex items-center gap-2 mt-2 flex-wrap">
+								{school.categories.slice(0, 2).map(cat => (
+									<Badge variant="outline" class="text-xs">
+										{cat}
+									</Badge>
+								))}
+							</div>
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<p class="text-sm text-muted-foreground mb-3 line-clamp-2">
+							{school.shortDescription}
+						</p>
+						<div class="flex items-center gap-1 text-xs text-muted-foreground">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+								<circle cx="12" cy="10" r="3"></circle>
+							</svg>
+							<a href={`/${stateSlug}/${citySlug}`} class="hover:text-primary hover:underline">
+								{city}
+							</a>
+						</div>
+					</CardContent>
+					<CardFooter>
+						<Button variant="outline" href={`/${stateSlug}/${citySlug}/${school.id}`} class="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+							View Details
+						</Button>
+					</CardFooter>
+				</Card>
+			)})}
+		</div>
+
+		<div class="text-center mt-10">
+			<Button size="lg" variant="outline" href="/browse">
+				View All Programs
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M5 12h14"></path>
+					<path d="m12 5 7 7-7 7"></path>
+				</svg>
+			</Button>
+		</div>
+	</Section>
+
+	<!-- Why Choose Us Section -->
+	<Section class="py-16 bg-background">
+		<div class="text-center mb-12">
+			<h2 class="text-3xl md:text-4xl font-bold mb-4 text-foreground">Why Parents Trust Us</h2>
+			<p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+				We make finding safe, quality swim lessons easy
+			</p>
+		</div>
+
+		<div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+			<div class="text-center">
+				<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="32"
+						height="32"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="text-primary"
+					>
+						<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+					</svg>
+				</div>
+				<h3 class="text-xl font-semibold mb-2">Safety First</h3>
+				<p class="text-muted-foreground">
+					All programs are vetted for safety certifications and qualified instructors
+				</p>
 			</div>
 
-			<!-- Heading with gradient -->
-			<h1 class="text-5xl md:text-7xl font-bold mb-6 text-primary">
-				Build faster with<br />beautiful components
-			</h1>
+			<div class="text-center">
+				<div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="32"
+						height="32"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="text-accent"
+					>
+						<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+					</svg>
+				</div>
+				<h3 class="text-xl font-semibold mb-2">Parent Reviews</h3>
+				<p class="text-muted-foreground">
+					Read honest reviews from real parents in your community
+				</p>
+			</div>
 
-			<!-- Description -->
-			<p class="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-				Beautifully designed components built with Astro and Tailwind
-				CSS. Copy, paste, and customize to build your next project.
+			<div class="text-center">
+				<div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="32"
+						height="32"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="text-secondary"
+					>
+						<path d="M7 10v12"></path>
+						<path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"></path>
+					</svg>
+				</div>
+				<h3 class="text-xl font-semibold mb-2">Easy Comparison</h3>
+				<p class="text-muted-foreground">
+					Compare programs, schedules, and pricing all in one place
+				</p>
+			</div>
+		</div>
+	</Section>
+
+	<!-- CTA Section -->
+	<Section class="py-20 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
+		<div class="max-w-3xl mx-auto text-center">
+			<h2 class="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+				Ready to Make a Splash?
+			</h2>
+			<p class="text-xl text-muted-foreground mb-8">
+				Join thousands of families who've found their perfect swim program
 			</p>
-
-			<!-- CTA Buttons -->
-			<div class="flex gap-4 justify-center mb-16">
-				<Button size="lg">
-					Get Started
+			<div class="flex gap-4 justify-center flex-wrap">
+				<Button size="lg" class="text-base" href="/browse">
+					Get Started Today
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="20"
@@ -66,107 +400,10 @@ import Section from "@/components/ui/Section.astro";
 						<path d="m12 5 7 7-7 7"></path>
 					</svg>
 				</Button>
-				<Button variant="outline" href="/components" size="lg"> View Components </Button>
+				<Button size="lg" variant="outline" href="/browse">
+					Browse Programs
+				</Button>
 			</div>
-
-			<!-- Trust indicators -->
-			<div
-				class="flex items-center justify-center gap-8 mb-16 text-sm text-muted-foreground"
-			>
-				<div class="flex items-center gap-2">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="text-primary"
-					>
-						<polyline points="20 6 9 17 4 12"></polyline>
-					</svg>
-					<span>Free & Open Source</span>
-				</div>
-				<div class="flex items-center gap-2">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="text-primary"
-					>
-						<polyline points="20 6 9 17 4 12"></polyline>
-					</svg>
-					<span>Fully Customizable</span>
-				</div>
-				<div class="flex items-center gap-2">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="text-primary"
-					>
-						<polyline points="20 6 9 17 4 12"></polyline>
-					</svg>
-					<span>Accessible by Default</span>
-				</div>
-			</div>
-
-			<!-- Code preview window -->
-			<div class="max-w-3xl mx-auto">
-				<div
-					class="rounded-lg border bg-card shadow-lg overflow-hidden"
-				>
-					<!-- Window header -->
-					<div
-						class="flex items-center gap-2 px-4 py-3 border-b bg-muted/50"
-					>
-						<div class="flex gap-2">
-							<div class="size-3 rounded-full bg-destructive/80">
-							</div>
-							<div class="size-3 rounded-full bg-accent/80"></div>
-							<div class="size-3 rounded-full bg-secondary/80">
-							</div>
-						</div>
-						<div
-							class="flex-1 text-center text-xs text-muted-foreground font-mono"
-						>
-							Button.astro
-						</div>
-					</div>
-					<!-- Code content -->
-					<div class="p-6 text-left bg-card">
-						<pre
-							class="text-sm font-mono overflow-x-auto"><code><span class="text-accent">&lt;Button</span> <span class="text-secondary">variant</span>=<span class="text-primary">"default"</span><span class="text-accent">&gt;</span>
-  Click me
-<span class="text-accent">&lt;/Button&gt;</span>
-
-<span class="text-accent">&lt;Button</span> <span class="text-secondary">variant</span>=<span class="text-primary">"outline"</span><span class="text-accent">&gt;</span>
-  Secondary
-<span class="text-accent">&lt;/Button&gt;</span></code></pre>
-					</div>
-				</div>
-			</div>
-		</Section>
-
-		<!-- Bottom gradient blur -->
-		<div
-			class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent"
-		>
 		</div>
-	</div>
+	</Section>
 </Layout>
