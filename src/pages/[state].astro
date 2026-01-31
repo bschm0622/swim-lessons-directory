@@ -9,6 +9,7 @@ import CardContent from "@/components/ui/CardContent.astro";
 import Badge from "@/components/ui/Badge.astro";
 import Button from "@/components/ui/Button.astro";
 import allSchools from "@/data/swim-schools.json";
+import { getSpecialtyByCategoryName } from "@/utils/specialty";
 
 export async function getStaticPaths() {
 	// Extract unique states
@@ -73,6 +74,17 @@ const cities = Array.from(citiesMap.entries()).map(([name, schools]) => ({
 	schools,
 	topRated: schools.sort((a, b) => b.rating - a.rating).slice(0, 3)
 })).sort((a, b) => a.name.localeCompare(b.name));
+
+// Extract unique specialties available in this state
+const allCategories = new Set<string>();
+state.schools.forEach(school => {
+	school.categories.forEach(cat => allCategories.add(cat));
+});
+
+const availableSpecialties = Array.from(allCategories)
+	.map(cat => getSpecialtyByCategoryName(cat))
+	.filter(s => s !== undefined)
+	.sort((a, b) => a.name.localeCompare(b.name));
 ---
 
 <Layout
@@ -122,6 +134,26 @@ const cities = Array.from(citiesMap.entries()).map(([name, schools]) => ({
 			</div>
 		</Section>
 	</div>
+
+	<!-- Filter by Specialty Section -->
+	{availableSpecialties.length > 1 && (
+		<Section class="py-12 bg-muted/20 border-b border-border/50">
+			<div class="max-w-5xl mx-auto">
+				<h2 class="text-xl font-semibold mb-4 text-center">Filter by Specialty</h2>
+				<div class="flex flex-wrap gap-3 justify-center">
+					{availableSpecialties.map(specialty => (
+						<a
+							href={`/${specialty.slug}/${state.slug}`}
+							class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors text-sm font-medium"
+						>
+							<span class="text-xl">{specialty.icon}</span>
+							<span>{specialty.name}</span>
+						</a>
+					))}
+				</div>
+			</div>
+		</Section>
+	)}
 
 	<!-- Cities Section -->
 	<Section class="py-16 bg-background">

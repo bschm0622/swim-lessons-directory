@@ -11,6 +11,7 @@ import CardContent from "@/components/ui/CardContent.astro";
 import CardFooter from "@/components/ui/CardFooter.astro";
 import Input from "@/components/ui/Input.astro";
 import allSchools from "@/data/swim-schools.json";
+import { getAllSpecialties, type SpecialtyConfig } from "@/utils/specialty";
 
 // Get top-rated schools for featured section (4.5+ rating)
 const featuredSchools = allSchools
@@ -18,16 +19,8 @@ const featuredSchools = allSchools
 	.sort((a, b) => b.rating - a.rating)
 	.slice(0, 4);
 
-// Extract unique categories from all schools
-const categoryIcons: Record<string, string> = {
-	"Parent & Child": "👶",
-	"Survival-First": "🛟",
-	"Adult & Teen": "👨‍🦱",
-	"Private / Semi-Private": "🏊‍♂️",
-	"Competitive / Clinics": "🏅",
-	"Adaptive / Special Needs": "💙",
-	"Mobile / At-Home": "🚗",
-};
+// Get specialty categories with slugs for navigation
+const specialties = getAllSpecialties();
 
 const colorRotation = [
 	"bg-accent/10 text-accent-foreground",
@@ -35,14 +28,11 @@ const colorRotation = [
 	"bg-secondary/10 text-secondary-foreground",
 ];
 
-const allCategories = new Set<string>();
-allSchools.forEach(school => {
-	school.categories.forEach(cat => allCategories.add(cat));
-});
-
-const categories = Array.from(allCategories).map((name, i) => ({
-	name,
-	icon: categoryIcons[name] || "🏊",
+// Map specialties to categories with colors
+const categories = specialties.map((specialty, i) => ({
+	name: specialty.name,
+	slug: specialty.slug,
+	icon: specialty.icon,
 	color: colorRotation[i % colorRotation.length]
 }));
 ---
@@ -177,10 +167,10 @@ const categories = Array.from(allCategories).map((name, i) => ({
 
 		<div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
 			{categories.map((category) => (
-				<button class={`${category.color} rounded-xl p-6 text-center hover:scale-105 transition-transform border border-border/50 hover:border-primary/30 hover:shadow-md`}>
+				<a href={`/${category.slug}`} class={`${category.color} rounded-xl p-6 text-center hover:scale-105 transition-transform border border-border/50 hover:border-primary/30 hover:shadow-md block`}>
 					<div class="text-4xl mb-3">{category.icon}</div>
 					<div class="font-medium text-sm">{category.name}</div>
-				</button>
+				</a>
 			))}
 		</div>
 	</Section>

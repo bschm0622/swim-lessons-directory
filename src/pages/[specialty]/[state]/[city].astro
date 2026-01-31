@@ -9,80 +9,107 @@ import CardContent from "@/components/ui/CardContent.astro";
 import Badge from "@/components/ui/Badge.astro";
 import Button from "@/components/ui/Button.astro";
 import allSchools from "@/data/swim-schools.json";
-import { getSpecialtyByCategoryName } from "@/utils/specialty";
+import { getAllSpecialties, getSpecialtyBySlug, type SpecialtyConfig } from "@/utils/specialty";
+import { parseAddress, getStateSlug, getCitySlug, STATE_NAMES } from "@/utils/location";
 
 export async function getStaticPaths() {
-	// Extract unique state/city combinations
-	const cityMap = new Map();
+	const paths: any[] = [];
 
-	allSchools.forEach(school => {
-		const addressParts = school.address.split(',').map(p => p.trim());
-		const city = addressParts[addressParts.length - 3] || '';
-		const stateWithZip = addressParts[addressParts.length - 2] || '';
-		const stateAbbrev = stateWithZip.split(' ')[0];
+	// For each specialty, find all city combinations
+	getAllSpecialties().forEach(specialty => {
+		const cityMap = new Map<string, {
+			stateName: string;
+			stateSlug: string;
+			stateAbbrev: string;
+			cityName: string;
+			citySlug: string;
+			schools: typeof allSchools;
+		}>();
 
-		if (city && stateAbbrev) {
-			// Map state abbreviations to full names
-			const stateNames: Record<string, string> = {
-				'IN': 'Indiana',
-				'TX': 'Texas',
-				'CA': 'California',
-				'NY': 'New York',
-				'FL': 'Florida',
-				// Add more as needed
-			};
+		// Filter schools by specialty and group by state + city
+		allSchools.forEach(school => {
+			const hasSpecialty = school.categories.includes(specialty.categoryName);
+			if (!hasSpecialty) return;
 
-			const stateName = stateNames[stateAbbrev] || stateAbbrev;
-			const stateSlug = stateName.toLowerCase().replace(/\s+/g, '-');
-			const citySlug = city.toLowerCase().replace(/\s+/g, '-');
+			const addressParts = parseAddress(school.address);
+
+			// Skip schools with invalid/empty address data
+			if (!addressParts.stateAbbrev || !addressParts.city) return;
+
+			const stateSlug = getStateSlug(addressParts.stateAbbrev);
+			const citySlug = getCitySlug(addressParts.city);
+
+			// Skip if slugs are empty
+			if (!stateSlug || !citySlug) return;
+
 			const key = `${stateSlug}/${citySlug}`;
 
 			if (!cityMap.has(key)) {
 				cityMap.set(key, {
-					stateName,
+					stateName: addressParts.stateName,
 					stateSlug,
-					stateAbbrev,
-					cityName: city,
+					stateAbbrev: addressParts.stateAbbrev,
+					cityName: addressParts.city,
 					citySlug,
 					schools: []
 				});
 			}
 
-			cityMap.get(key).schools.push(school);
-		}
+			cityMap.get(key)!.schools.push(school);
+		});
+
+		// Create paths for each city
+		cityMap.forEach((cityData) => {
+			paths.push({
+				params: {
+					specialty: specialty.slug,
+					state: cityData.stateSlug,
+					city: cityData.citySlug
+				},
+				props: {
+					specialty,
+					stateName: cityData.stateName,
+					stateSlug: cityData.stateSlug,
+					stateAbbrev: cityData.stateAbbrev,
+					cityName: cityData.cityName,
+					citySlug: cityData.citySlug,
+					schools: cityData.schools
+				}
+			});
+		});
 	});
 
-	return Array.from(cityMap.values()).map(cityData => ({
-		params: { state: cityData.stateSlug, city: cityData.citySlug },
-		props: { cityData }
-	}));
+	return paths;
 }
 
-const { cityData } = Astro.props;
+const { specialty, stateName, stateSlug, stateAbbrev, cityName, citySlug, schools } = Astro.props;
 
 // Sort schools by rating
-const schools = cityData.schools.sort((a, b) => b.rating - a.rating);
+const sortedSchools = schools.sort((a: any, b: any) => b.rating - a.rating);
+
+// Calculate stats
+const topRatedCount = schools.filter((s: any) => s.rating >= 4.5).length;
+
+// Find related specialties available in this city
+const allCategoriesInCity = new Set<string>();
+schools.forEach((school: any) => {
+	school.categories.forEach((cat: string) => allCategoriesInCity.add(cat));
+});
+
+const relatedSpecialties = getAllSpecialties()
+	.filter(s => s.categoryName !== specialty.categoryName && allCategoriesInCity.has(s.categoryName))
+	.slice(0, 3);
 
 // Extract unique categories from these schools
-const allCategories = new Set<string>();
-schools.forEach(school => {
-	school.categories.forEach(cat => allCategories.add(cat));
-});
-const categories = Array.from(allCategories);
-
-// Get specialty info for filter buttons
-const availableSpecialties = Array.from(allCategories)
-	.map(cat => getSpecialtyByCategoryName(cat))
-	.filter(s => s !== undefined)
-	.sort((a, b) => a.name.localeCompare(b.name));
+const uniqueCategories = Array.from(allCategoriesInCity);
 ---
 
 <Layout
-	title={`Swim Lessons in ${cityData.cityName}, ${cityData.stateAbbrev} - ${schools.length} Programs`}
-	description={`Find the best swim lessons in ${cityData.cityName}, ${cityData.stateName}. Compare ${schools.length} programs, read reviews, and choose the perfect swim school for your family.`}
+	title={`${specialty.seoTitle} in ${cityName}, ${stateAbbrev} - Best Programs`}
+	description={`Compare ${schools.length} ${specialty.seoTitle.toLowerCase()} schools in ${cityName}, ${stateName}. Read reviews, check ratings, and find the best program for your needs.`}
 >
 	<!-- Hero Section -->
-	<div class="relative min-h-[500px] bg-gradient-to-br from-secondary/20 via-primary/10 to-accent/20 flex items-center">
+	<div class="relative min-h-[500px] bg-gradient-to-br from-primary/20 via-accent/10 to-secondary/20 flex items-center">
 		<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSJyZ2JhKDAsIDE1MCwgMjAwLCAwLjA1KSIvPjwvZz48L3N2Zz4=')] opacity-50"></div>
 
 		<Section class="relative z-10 py-20">
@@ -92,18 +119,24 @@ const availableSpecialties = Array.from(allCategories)
 					<ol class="flex items-center gap-2 flex-wrap">
 						<li><a href="/" class="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
 						<li class="text-muted-foreground">/</li>
-						<li><a href={`/${cityData.stateSlug}`} class="text-muted-foreground hover:text-primary transition-colors">{cityData.stateName}</a></li>
+						<li><a href={`/${specialty.slug}`} class="text-muted-foreground hover:text-primary transition-colors">{specialty.name}</a></li>
 						<li class="text-muted-foreground">/</li>
-						<li class="text-foreground font-medium">{cityData.cityName}</li>
+						<li><a href={`/${specialty.slug}/${stateSlug}`} class="text-muted-foreground hover:text-primary transition-colors">{stateName}</a></li>
+						<li class="text-muted-foreground">/</li>
+						<li class="text-foreground font-medium">{cityName}</li>
 					</ol>
 				</nav>
 
+				<!-- Icon -->
+				<div class="text-5xl mb-4">{specialty.icon}</div>
+
+				<!-- H1 -->
 				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
-					Best Swim Lessons in <span class="text-primary">{cityData.cityName}</span>
+					<span class="text-primary">{specialty.seoTitle}</span> in {cityName}
 				</h1>
 
 				<p class="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-3xl">
-					Compare {schools.length} top-rated swim {schools.length === 1 ? 'program' : 'programs'} and find the perfect fit for your family
+					Compare {schools.length} top-rated {schools.length === 1 ? 'program' : 'programs'} and find the perfect fit for your family
 				</p>
 
 				<!-- Stats -->
@@ -113,58 +146,39 @@ const availableSpecialties = Array.from(allCategories)
 						<div class="text-sm text-muted-foreground font-medium">Programs</div>
 					</div>
 					<div class="bg-card/80 backdrop-blur-sm border-2 border-secondary/20 rounded-xl px-6 py-4 hover:border-secondary/40 transition-colors">
-						<div class="text-3xl font-bold text-secondary">
-							{schools.filter(s => s.rating >= 4.5).length}
-						</div>
+						<div class="text-3xl font-bold text-secondary">{topRatedCount}</div>
 						<div class="text-sm text-muted-foreground font-medium">Top Rated (4.5+)</div>
 					</div>
 					<div class="bg-card/80 backdrop-blur-sm border-2 border-accent/20 rounded-xl px-6 py-4 hover:border-accent/40 transition-colors">
-						<div class="text-3xl font-bold text-accent">{categories.length}</div>
+						<div class="text-3xl font-bold text-accent">{uniqueCategories.length}</div>
 						<div class="text-sm text-muted-foreground font-medium">Specialties</div>
 					</div>
 				</div>
-
-				{categories.length > 0 && (
-					<div>
-						<p class="text-sm font-medium text-muted-foreground mb-3">Available Programs:</p>
-						<div class="flex flex-wrap gap-2">
-							{categories.map(cat => (
-								<Badge variant="outline" class="text-sm">{cat}</Badge>
-							))}
-						</div>
-					</div>
-				)}
 			</div>
 		</Section>
 	</div>
 
-	<!-- Filter by Specialty Section -->
-	{availableSpecialties.length > 1 && (
-		<Section class="py-12 bg-muted/20 border-b border-border/50">
-			<div class="max-w-5xl mx-auto">
-				<h2 class="text-xl font-semibold mb-4 text-center">Filter by Specialty</h2>
-				<div class="flex flex-wrap gap-3 justify-center">
-					{availableSpecialties.map(specialty => (
-						<a
-							href={`/${specialty.slug}/${cityData.stateSlug}/${cityData.citySlug}`}
-							class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors text-sm font-medium"
-						>
-							<span class="text-xl">{specialty.icon}</span>
-							<span>{specialty.name}</span>
-						</a>
-					))}
-				</div>
+	<!-- Quick Benefits Bar -->
+	<div class="bg-muted/30 py-8">
+		<Section>
+			<div class="flex flex-wrap gap-4 justify-center text-sm max-w-4xl mx-auto">
+				{specialty.benefits.slice(0, 3).map(benefit => (
+					<span class="flex items-center gap-2 bg-card px-4 py-2 rounded-full border border-border/50">
+						<span class="text-primary text-lg">✓</span>
+						<span class="font-medium">{benefit}</span>
+					</span>
+				))}
 			</div>
 		</Section>
-	)}
+	</div>
 
-	<!-- Schools Grid -->
+	<!-- All Schools Grid -->
 	<Section class="py-16 bg-background">
-		<h2 class="text-3xl font-bold mb-8">All Swim Programs in {cityData.cityName}</h2>
+		<h2 class="text-3xl font-bold mb-8">All {specialty.seoTitle} Programs in {cityName}</h2>
 
 		<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-			{schools.map(school => (
-				<Card class="hover:shadow-xl transition-shadow">
+			{sortedSchools.map((school: any) => (
+				<Card class="hover:shadow-xl transition-shadow h-full flex flex-col">
 					<CardHeader>
 						<div class="flex items-start justify-between mb-3">
 							<div class="text-4xl">
@@ -177,7 +191,7 @@ const availableSpecialties = Array.from(allCategories)
 							)}
 						</div>
 						<CardTitle>
-							<a href={`/${cityData.stateSlug}/${cityData.citySlug}/${school.id}`} class="hover:text-primary transition-colors">
+							<a href={`/${stateSlug}/${citySlug}/${school.id}`} class="hover:text-primary transition-colors">
 								{school.name}
 							</a>
 						</CardTitle>
@@ -185,7 +199,7 @@ const availableSpecialties = Array.from(allCategories)
 							<div class="mt-2 mb-3">
 								<div class="text-xs text-muted-foreground mb-2">{school.facilityType}</div>
 								<div class="flex flex-wrap gap-1">
-									{school.categories.slice(0, 2).map(cat => (
+									{school.categories.slice(0, 2).map((cat: string) => (
 										<Badge variant="outline" class="text-xs">
 											{cat}
 										</Badge>
@@ -199,8 +213,8 @@ const availableSpecialties = Array.from(allCategories)
 							</div>
 						</CardDescription>
 					</CardHeader>
-					<CardContent>
-						<p class="text-sm text-muted-foreground mb-4 line-clamp-3">
+					<CardContent class="flex-grow flex flex-col">
+						<p class="text-sm text-muted-foreground mb-4 line-clamp-3 flex-grow">
 							{school.shortDescription}
 						</p>
 
@@ -234,7 +248,7 @@ const availableSpecialties = Array.from(allCategories)
 							)}
 						</div>
 
-						<Button variant="outline" href={`/${cityData.stateSlug}/${cityData.citySlug}/${school.id}`} class="w-full">
+						<Button variant="outline" href={`/${stateSlug}/${citySlug}/${school.id}`} class="w-full">
 							View Details
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 								<path d="M5 12h14"></path>
@@ -247,6 +261,30 @@ const availableSpecialties = Array.from(allCategories)
 		</div>
 	</Section>
 
+	<!-- Related Specialties Section -->
+	{relatedSpecialties.length > 0 && (
+		<Section class="py-16 bg-muted/30">
+			<div class="max-w-4xl mx-auto">
+				<h3 class="text-2xl font-bold mb-6 text-center">Other Programs in {cityName}</h3>
+				<p class="text-muted-foreground text-center mb-8">
+					Explore additional swim lesson specialties available in {cityName}
+				</p>
+
+				<div class="grid md:grid-cols-3 gap-4">
+					{relatedSpecialties.map(relatedSpecialty => (
+						<a
+							href={`/${relatedSpecialty.slug}/${stateSlug}/${citySlug}`}
+							class={`${relatedSpecialty.color} rounded-xl p-6 text-center hover:scale-105 transition-transform border border-border/50 hover:border-primary/30 hover:shadow-md block`}
+						>
+							<div class="text-4xl mb-3">{relatedSpecialty.icon}</div>
+							<div class="font-medium text-sm text-foreground">{relatedSpecialty.name}</div>
+						</a>
+					))}
+				</div>
+			</div>
+		</Section>
+	)}
+
 	<!-- CTA Section -->
 	<Section class="py-16 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
 		<div class="max-w-3xl mx-auto text-center">
@@ -254,15 +292,16 @@ const availableSpecialties = Array.from(allCategories)
 				Can't Find What You're Looking For?
 			</h2>
 			<p class="text-lg text-muted-foreground mb-6">
-				We're constantly adding new swim programs. Check back soon or explore other cities in {cityData.stateName}.
+				Explore all {specialty.seoTitle.toLowerCase()} programs in {stateName} or browse other cities
 			</p>
-			<Button size="lg" variant="outline" href={`/${cityData.stateSlug}`}>
-				Browse All {cityData.stateName} Programs
-				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<path d="M5 12h14"></path>
-					<path d="m12 5 7 7-7 7"></path>
-				</svg>
-			</Button>
+			<div class="flex flex-wrap gap-3 justify-center">
+				<Button size="lg" variant="outline" href={`/${specialty.slug}/${stateSlug}`}>
+					All {specialty.name} in {stateName}
+				</Button>
+				<Button size="lg" variant="outline" href={`/${stateSlug}/${citySlug}`}>
+					All Programs in {cityName}
+				</Button>
+			</div>
 		</div>
 	</Section>
 </Layout>
