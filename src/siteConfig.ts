@@ -38,10 +38,10 @@ export interface SiteConfiguration {
 }
 
 export const SITE: SiteConfiguration = {
-    title: "",
-    name: "Modern Astro Components",
-    description: "Built with Astro, Tailwind CSS, and Markdown.",
-    href: "https://astro-boilerplate.beckyschmidt.me",
+    title: "Swim Lessons Directory",
+    name: "Swim Lessons Directory",
+    description: "Find the perfect swim lessons for your family. Browse specialty programs, compare schools, and read reviews.",
+    href: "https://swimlessonsdirectory.com",
     author: "Becky Schmidt",
     locale: "en-US",
 
@@ -53,10 +53,23 @@ export const SITE: SiteConfiguration = {
 
     nav: [
         { label: "Home", href: "/" },
+        { label: "Browse", href: "/browse" },
         { label: "About", href: "/about" },
-        { label: "Blog", href: "/blog" },
-        { label: "Components", href: "/all-components"}
+        { label: "Private Lessons", href: "/private-swim-lessons" },
+        { label: "Parent & Child", href: "/parent-child-swim-lessons" },
+        { label: "Survival Swim", href: "/survival-swim-lessons" }
     ],
 
-    copyright: `© ${new Date().getFullYear()} Becky Schmidt. All rights reserved.`,
+    footerNav: [
+        { label: "Private Swim Lessons", href: "/private-swim-lessons" },
+        { label: "Parent & Child", href: "/parent-child-swim-lessons" },
+        { label: "Adult & Teen", href: "/adult-swim-lessons" },
+        { label: "Competitive", href: "/competitive-swim-lessons" },
+        { label: "Survival Swim", href: "/survival-swim-lessons" },
+        { label: "Adaptive / Special Needs", href: "/special-needs-swim-lessons" },
+        { label: "Mobile / At-Home", href: "/at-home-swim-lessons" },
+        { label: "Browse All", href: "/browse" }
+    ],
+
+    copyright: `© ${new Date().getFullYear()} Swim Lessons Directory. All rights reserved.`,
 };

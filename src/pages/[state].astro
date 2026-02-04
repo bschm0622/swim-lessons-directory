@@ -8,6 +8,7 @@ import CardDescription from "@/components/ui/CardDescription.astro";
 import CardContent from "@/components/ui/CardContent.astro";
 import Badge from "@/components/ui/Badge.astro";
 import Button from "@/components/ui/Button.astro";
+import SchemaMarkup from "@/components/SchemaMarkup.astro";
 import allSchools from "@/data/swim-schools.json";
 import { getSpecialtyByCategoryName } from "@/utils/specialty";
 
@@ -91,26 +92,47 @@ const availableSpecialties = Array.from(allCategories)
 	title={`Swim Lessons in ${state.name} - Find the Best Programs`}
 	description={`Discover ${state.schools.length} swim schools across ${cities.length} cities in ${state.name}. Compare programs, read reviews, and find the perfect swim lessons for your family.`}
 >
-	<!-- Hero Section -->
-	<div class="relative min-h-[500px] bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 flex items-center">
-		<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSJyZ2JhKDAsIDE1MCwgMjAwLCAwLjA1KSIvPjwvZz48L3N2Zz4=')] opacity-50"></div>
+	<!-- Schema Markup for SEO -->
+	<SchemaMarkup
+		type="breadcrumb"
+		slot="head"
+		breadcrumbs={[
+			{ name: 'Home', url: '/' },
+			{ name: state.name, url: `/${state.slug}` }
+		]}
+	/>
 
-		<Section class="relative z-10 py-20">
+	<!-- Hero Image Section -->
+	<div class="relative h-[500px] overflow-hidden">
+		<!-- Background Image -->
+		<div class="absolute inset-0">
+			<img
+				src="https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=1920&q=80"
+				alt="Swimming lessons"
+				class="w-full h-full object-cover"
+				loading="eager"
+			/>
+		</div>
+		<!-- Dark gradient overlay -->
+		<div class="absolute inset-0 bg-gradient-to-b from-foreground/60 via-foreground/50 to-background"></div>
+
+		<!-- Content overlay on image -->
+		<Section class="relative z-10 h-full flex items-center">
 			<div class="max-w-4xl">
 				<!-- Breadcrumb -->
 				<nav class="mb-8 text-sm">
 					<ol class="flex items-center gap-2">
-						<li><a href="/" class="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
-						<li class="text-muted-foreground">/</li>
-						<li class="text-foreground font-medium">{state.name}</li>
+						<li><a href="/" class="text-white/90 hover:text-white transition-colors drop-shadow-md">Home</a></li>
+						<li class="text-white/70">/</li>
+						<li class="text-white font-medium drop-shadow-md">{state.name}</li>
 					</ol>
 				</nav>
 
-				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
-					Swim Lessons in <span class="text-primary">{state.name}</span>
+				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight drop-shadow-lg">
+					Swim Lessons in <span class="text-secondary">{state.name}</span>
 				</h1>
 
-				<p class="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
+				<p class="text-xl md:text-2xl text-white/95 mb-8 leading-relaxed drop-shadow-md">
 					Discover {state.schools.length} top-rated swim programs across {cities.length} {cities.length === 1 ? 'city' : 'cities'}
 				</p>
 
@@ -146,7 +168,7 @@ const availableSpecialties = Array.from(allCategories)
 							href={`/${specialty.slug}/${state.slug}`}
 							class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors text-sm font-medium"
 						>
-							<span class="text-xl">{specialty.icon}</span>
+							<img src={specialty.icon} alt={specialty.name} class="w-6 h-6 object-contain" />
 							<span>{specialty.name}</span>
 						</a>
 					))}
@@ -181,8 +203,7 @@ const availableSpecialties = Array.from(allCategories)
 							<Card class="hover:shadow-lg transition-shadow">
 								<CardHeader>
 									<div class="flex items-start justify-between mb-2">
-										<div class="text-3xl">🏊‍♀️</div>
-										{school.rating > 0 && (
+											{school.rating > 0 && (
 											<Badge variant="secondary" class="text-xs">
 												⭐ {school.rating.toFixed(1)}
 											</Badge>

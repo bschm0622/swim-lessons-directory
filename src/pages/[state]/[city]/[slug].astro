@@ -8,6 +8,7 @@ import CardHeader from "@/components/ui/CardHeader.astro";
 import CardTitle from "@/components/ui/CardTitle.astro";
 import CardDescription from "@/components/ui/CardDescription.astro";
 import CardContent from "@/components/ui/CardContent.astro";
+import SchemaMarkup from "@/components/SchemaMarkup.astro";
 import allSchools from "@/data/swim-schools.json";
 import { marked } from "marked";
 
@@ -63,22 +64,70 @@ const relatedSchools = allSchools
 	title={`${school.name} - ${city}, ${stateAbbrev} | Swim Lessons`}
 	description={school.shortDescription || `Swim lessons at ${school.name} in ${city}, ${stateAbbrev}. ${school.categories.join(', ')}.`}
 >
-	<!-- Hero Section -->
-		<Section class="relative z-10">
-			<!-- Breadcrumb -->
-			<nav class="mb-8 text-sm">
-				<ol class="flex items-center gap-2 flex-wrap">
-					<li><a href="/" class="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
-					<li class="text-muted-foreground">/</li>
-					<li><a href={`/${stateSlug}`} class="text-muted-foreground hover:text-primary transition-colors">{stateName}</a></li>
-					<li class="text-muted-foreground">/</li>
-					<li><a href={`/${stateSlug}/${citySlug}`} class="text-muted-foreground hover:text-primary transition-colors">{city}</a></li>
-					<li class="text-muted-foreground">/</li>
-					<li class="text-foreground font-medium">{school.name}</li>
-				</ol>
-			</nav>
+	<!-- Schema Markup for SEO -->
+	<SchemaMarkup
+		type="local-business"
+		slot="head"
+		business={{
+			name: school.name,
+			description: school.shortDescription,
+			address: school.address,
+			phone: school.phone,
+			website: school.website,
+			rating: school.rating,
+			coordinates: school.coordinates,
+			categories: school.categories,
+			priceTier: school.priceTier,
+			hours: school.hours
+		}}
+	/>
+	<SchemaMarkup
+		type="breadcrumb"
+		slot="head"
+		breadcrumbs={[
+			{ name: 'Home', url: '/' },
+			{ name: stateName, url: `/${stateSlug}` },
+			{ name: city, url: `/${stateSlug}/${citySlug}` },
+			{ name: school.name, url: `/${stateSlug}/${citySlug}/${school.id}` }
+		]}
+	/>
 
-			<div class="max-w-4xl mx-auto">
+	<!-- Hero Image Section -->
+	<div class="relative h-[400px] overflow-hidden">
+		<!-- Background Image -->
+		<div class="absolute inset-0">
+			<img
+				src="https://images.unsplash.com/photo-1519315901367-f34ff9154487?auto=format&fit=crop&w=1920&q=80"
+				alt="Swimming pool"
+				class="w-full h-full object-cover"
+				loading="eager"
+			/>
+		</div>
+		<!-- Dark gradient overlay -->
+		<div class="absolute inset-0 bg-gradient-to-b from-foreground/60 via-foreground/50 to-background"></div>
+
+		<!-- Breadcrumb overlay on image -->
+		<div class="absolute bottom-6 left-0 right-0 z-10">
+			<Section>
+				<nav class="text-sm">
+					<ol class="flex items-center gap-2 flex-wrap">
+						<li><a href="/" class="text-white/90 hover:text-white transition-colors drop-shadow-md">Home</a></li>
+						<li class="text-white/70">/</li>
+						<li><a href={`/${stateSlug}`} class="text-white/90 hover:text-white transition-colors drop-shadow-md">{stateName}</a></li>
+						<li class="text-white/70">/</li>
+						<li><a href={`/${stateSlug}/${citySlug}`} class="text-white/90 hover:text-white transition-colors drop-shadow-md">{city}</a></li>
+						<li class="text-white/70">/</li>
+						<li class="text-white font-medium drop-shadow-md">{school.name}</li>
+					</ol>
+				</nav>
+			</Section>
+		</div>
+	</div>
+
+	<!-- Main Content Section -->
+	<Section class="relative z-10 -mt-20">
+		<!-- Content Card with white background -->
+		<div class="bg-card rounded-2xl shadow-2xl p-8 md:p-12 max-w-4xl mx-auto">
 				<!-- Title & Rating -->
 				<div class="mb-6">
 					{school.rating > 0 && (
@@ -150,15 +199,15 @@ const relatedSchools = allSchools
 					)}
 				</div>
 
-				<!-- About Section (Main Description) -->
-				{summaryHtml && (
-					<div class="mb-12">
-						<h2 class="text-3xl font-bold mb-6 text-foreground">About {school.name}</h2>
-						<div class="typography" set:html={summaryHtml} />
-					</div>
-				)}
-			</div>
-		</Section>
+			<!-- About Section (Main Description) -->
+			{summaryHtml && (
+				<div class="mb-8">
+					<h2 class="text-3xl font-bold mb-6 text-foreground">About {school.name}</h2>
+					<div class="typography" set:html={summaryHtml} />
+				</div>
+			)}
+		</div>
+	</Section>
 
 	<!-- Special Features -->
 	{school.specialFeatures.length > 0 && school.specialFeatures[0] !== 'Not Specified' && (
@@ -247,7 +296,6 @@ const relatedSchools = allSchools
 					<Card class="hover:shadow-xl transition-all hover:-translate-y-1">
 						<CardHeader>
 							<div class="flex items-start justify-between mb-2">
-								<div class="text-4xl">🏊‍♀️</div>
 								{related.rating > 0 && (
 									<Badge variant="secondary" class="text-xs">
 										⭐ {related.rating.toFixed(1)}

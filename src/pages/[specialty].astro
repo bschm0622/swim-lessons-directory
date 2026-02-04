@@ -8,6 +8,7 @@ import CardDescription from "@/components/ui/CardDescription.astro";
 import CardContent from "@/components/ui/CardContent.astro";
 import Badge from "@/components/ui/Badge.astro";
 import Button from "@/components/ui/Button.astro";
+import SchemaMarkup from "@/components/SchemaMarkup.astro";
 import allSchools from "@/data/swim-schools.json";
 import { getAllSpecialties, getSpecialtyBySlug, type SpecialtyConfig } from "@/utils/specialty";
 import { parseAddress, getStateSlug, STATE_NAMES } from "@/utils/location";
@@ -101,6 +102,25 @@ const totalCities = new Set(schools.map((s: any) => parseAddress(s.address).city
 	title={`${specialty.seoTitle} - Find Programs Near You`}
 	description={`Find ${specialty.seoTitle.toLowerCase()} programs across ${totalStates} ${totalStates === 1 ? 'state' : 'states'} and ${totalCities} ${totalCities === 1 ? 'city' : 'cities'}. Compare top-rated schools, read reviews, and discover the perfect program near you.`}
 >
+	<!-- Schema Markup for SEO -->
+	<SchemaMarkup
+		type="service"
+		slot="head"
+		service={{
+			name: specialty.seoTitle,
+			description: specialty.shortDescription,
+			serviceType: specialty.categoryName
+		}}
+	/>
+	<SchemaMarkup
+		type="breadcrumb"
+		slot="head"
+		breadcrumbs={[
+			{ name: 'Home', url: '/' },
+			{ name: specialty.name, url: `/${specialty.slug}` }
+		]}
+	/>
+
 	<!-- Hero Section -->
 	<div class="relative min-h-[600px] bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 flex items-center">
 		<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSJyZ2JhKDAsIDE1MCwgMjAwLCAwLjA1KSIvPjwvZz48L3N2Zz4=')] opacity-50"></div>
@@ -117,7 +137,9 @@ const totalCities = new Set(schools.map((s: any) => parseAddress(s.address).city
 				</nav>
 
 				<!-- Icon -->
-				<div class="text-6xl mb-6">{specialty.icon}</div>
+				<div class="mb-6">
+					<img src={specialty.icon} alt={specialty.name} class="w-24 h-24 object-contain" />
+				</div>
 
 				<!-- H1 -->
 				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
@@ -197,9 +219,6 @@ const totalCities = new Set(schools.map((s: any) => parseAddress(s.address).city
 							<Card class="hover:shadow-lg transition-shadow">
 								<CardHeader>
 									<div class="flex items-start justify-between mb-2">
-										<div class="text-3xl">
-											{school.specialFeatures.includes('On-Site Childcare') ? '👨‍👩‍👧' : '🏊‍♀️'}
-										</div>
 										{school.rating > 0 && (
 											<Badge variant="secondary" class="text-xs">
 												⭐ {school.rating.toFixed(1)}
@@ -253,7 +272,7 @@ const totalCities = new Set(schools.map((s: any) => parseAddress(s.address).city
 	<Section class="py-16 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
 		<div class="max-w-3xl mx-auto text-center">
 			<h2 class="text-3xl md:text-4xl font-bold mb-6">
-				Is {specialty.seoTitle} Right for You?
+				Are {specialty.seoTitle} Right for You?
 			</h2>
 			<p class="text-lg text-muted-foreground mb-6">
 				Perfect for: {specialty.targetAudience}

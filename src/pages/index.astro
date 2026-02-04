@@ -10,8 +10,10 @@ import CardDescription from "@/components/ui/CardDescription.astro";
 import CardContent from "@/components/ui/CardContent.astro";
 import CardFooter from "@/components/ui/CardFooter.astro";
 import Input from "@/components/ui/Input.astro";
+import SchemaMarkup from "@/components/SchemaMarkup.astro";
+import PagefindSearch from "astro-pagefind/components/Search";
 import allSchools from "@/data/swim-schools.json";
-import { getAllSpecialties, type SpecialtyConfig } from "@/utils/specialty";
+import { getAllSpecialties } from "@/utils/specialty";
 
 // Get top-rated schools for featured section (4.5+ rating)
 const featuredSchools = allSchools
@@ -22,22 +24,20 @@ const featuredSchools = allSchools
 // Get specialty categories with slugs for navigation
 const specialties = getAllSpecialties();
 
-const colorRotation = [
-	"bg-accent/10 text-accent-foreground",
-	"bg-primary/10 text-primary",
-	"bg-secondary/10 text-secondary-foreground",
-];
-
-// Map specialties to categories with colors
-const categories = specialties.map((specialty, i) => ({
+// Map specialties to categories with consistent color
+const categories = specialties.map((specialty) => ({
 	name: specialty.name,
 	slug: specialty.slug,
 	icon: specialty.icon,
-	color: colorRotation[i % colorRotation.length]
+	color: 'bg-muted'
 }));
 ---
 
 <Layout title="Find Specialty Swim Lessons Near You" description="Discover the perfect swim program for your family">
+	<!-- Schema Markup for SEO -->
+	<SchemaMarkup type="organization" slot="head" />
+	<SchemaMarkup type="website-search" slot="head" />
+
 	<!-- Hero Section with Background Image -->
 	<div class="relative min-h-[600px] flex items-center justify-center overflow-hidden">
 		<!-- Background Image from Unsplash -->
@@ -68,7 +68,7 @@ const categories = specialties.map((specialty, i) => ({
 			</p>
 
 			<!-- Search Bar Overlay -->
-			<div class="max-w-3xl mx-auto mb-8">
+			<div class="max-w-3xl mx-auto mb-8 relative">
 				<div class="bg-card shadow-2xl">
 					<div class="relative">
 						<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
@@ -89,16 +89,30 @@ const categories = specialties.map((specialty, i) => ({
 							</svg>
 						</div>
 						<Input
+							id="hero-search-input"
 							type="text"
 							placeholder="Search by location, specialty, or program name..."
 							class="h-16 pl-14 pr-32 text-lg border-0 focus:ring-2 focus:ring-primary"
+							autocomplete="off"
 						/>
 						<div class="absolute inset-y-0 right-2 flex items-center">
-							<Button size="lg" class="h-12 px-8 text-base">
+							<Button id="hero-search-button" size="lg" class="h-12 px-8 text-base">
 								Search
 							</Button>
 						</div>
 					</div>
+				</div>
+
+				<!-- Search Dropdown -->
+				<div id="hero-search-dropdown" class="absolute w-full mt-2 bg-card border border-border rounded-lg shadow-2xl hidden z-50 overflow-hidden">
+					<PagefindSearch
+						id="hero-search"
+						className="pagefind-ui"
+						uiOptions={{
+							showImages: false,
+							translations: { placeholder: "Search..." },
+						}}
+					/>
 				</div>
 			</div>
 
@@ -168,8 +182,10 @@ const categories = specialties.map((specialty, i) => ({
 		<div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
 			{categories.map((category) => (
 				<a href={`/${category.slug}`} class={`${category.color} rounded-xl p-6 text-center hover:scale-105 transition-transform border border-border/50 hover:border-primary/30 hover:shadow-md block`}>
-					<div class="text-4xl mb-3">{category.icon}</div>
-					<div class="font-medium text-sm">{category.name}</div>
+					<div class="flex justify-center mb-3">
+						<img src={category.icon} alt={category.name} class="w-16 h-16 object-contain" />
+					</div>
+					<div class="font-medium text-sm text-foreground">{category.name}</div>
 				</a>
 			))}
 		</div>
@@ -201,13 +217,11 @@ const categories = specialties.map((specialty, i) => ({
 				const stateName = stateNames[stateAbbrev] || stateAbbrev;
 				const stateSlug = stateName.toLowerCase().replace(/\s+/g, '-');
 				const citySlug = city.toLowerCase().replace(/\s+/g, '-');
-				const emoji = school.specialFeatures.includes('On-Site Childcare') ? '👨‍👩‍👧' : '🏊‍♀️';
 
 				return (
 				<Card class="hover:shadow-xl transition-shadow cursor-pointer group">
 					<CardHeader>
 						<div class="flex items-start justify-between mb-3">
-							<div class="text-5xl">{emoji}</div>
 							<Badge variant="secondary" class="text-xs">
 								⭐ {school.rating.toFixed(1)}
 							</Badge>
@@ -397,3 +411,107 @@ const categories = specialties.map((specialty, i) => ({
 		</div>
 	</Section>
 </Layout>
+
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', function() {
+		const heroInput = document.getElementById('hero-search-input');
+		const searchButton = document.getElementById('hero-search-button');
+		const dropdown = document.getElementById('hero-search-dropdown');
+
+		// Wait for Pagefind to load
+		setTimeout(() => {
+			const pagefindInput = dropdown.querySelector('input[type="text"]');
+
+			if (!pagefindInput) return;
+
+			// Sync hero input with Pagefind input
+			heroInput.addEventListener('input', function(e) {
+				pagefindInput.value = e.target.value;
+
+				// Trigger input event on Pagefind search
+				const event = new Event('input', { bubbles: true });
+				pagefindInput.dispatchEvent(event);
+
+				// Show dropdown when typing
+				if (e.target.value.length > 0) {
+					dropdown.classList.remove('hidden');
+				} else {
+					dropdown.classList.add('hidden');
+				}
+			});
+
+			// Show dropdown on focus if there's a value
+			heroInput.addEventListener('focus', function() {
+				if (heroInput.value.length > 0) {
+					dropdown.classList.remove('hidden');
+				}
+			});
+
+			// Hide dropdown on click outside
+			document.addEventListener('click', function(e) {
+				if (!heroInput.contains(e.target) &&
+					!dropdown.contains(e.target) &&
+					!searchButton.contains(e.target)) {
+					dropdown.classList.add('hidden');
+				}
+			});
+
+			// Handle escape key
+			heroInput.addEventListener('keydown', function(e) {
+				if (e.key === 'Escape') {
+					dropdown.classList.add('hidden');
+					heroInput.blur();
+				}
+			});
+
+			// Search button opens full modal
+			searchButton.addEventListener('click', function() {
+				if (window.openSearchModal) {
+					window.openSearchModal();
+				}
+			});
+		}, 500);
+	});
+</script>
+
+<style is:global>
+	#hero-search .pagefind-ui {
+		--pagefind-ui-primary: var(--color-primary);
+		--pagefind-ui-text: var(--color-foreground);
+		--pagefind-ui-background: var(--color-background);
+		--pagefind-ui-border: var(--color-border);
+		--pagefind-ui-font: var(--font-sans);
+	}
+
+	/* Hide the Pagefind input and button since we use the hero input */
+	#hero-search .pagefind-ui__search-input,
+	#hero-search .pagefind-ui__search-clear {
+		display: none;
+	}
+
+	/* Remove spacing from form since input is hidden */
+	#hero-search .pagefind-ui__form {
+		padding: 0;
+		margin: 0;
+		min-height: 0;
+	}
+
+	#hero-search .pagefind-ui__message {
+		color: var(--color-muted-foreground);
+		padding: 1rem;
+	}
+
+	#hero-search .pagefind-ui__result-title,
+	#hero-search .pagefind-ui__result-link {
+		font-family: var(--font-sans);
+	}
+
+	#hero-search .pagefind-ui__result-excerpt {
+		font-family: var(--font-sans);
+	}
+
+	#hero-search .pagefind-ui__results-area {
+		max-height: 60vh;
+		overflow-y: auto;
+	}
+</style>

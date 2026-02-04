@@ -8,6 +8,7 @@ import CardDescription from "@/components/ui/CardDescription.astro";
 import CardContent from "@/components/ui/CardContent.astro";
 import Badge from "@/components/ui/Badge.astro";
 import Button from "@/components/ui/Button.astro";
+import SchemaMarkup from "@/components/SchemaMarkup.astro";
 import allSchools from "@/data/swim-schools.json";
 import { getSpecialtyByCategoryName } from "@/utils/specialty";
 
@@ -81,28 +82,50 @@ const availableSpecialties = Array.from(allCategories)
 	title={`Swim Lessons in ${cityData.cityName}, ${cityData.stateAbbrev} - ${schools.length} Programs`}
 	description={`Find the best swim lessons in ${cityData.cityName}, ${cityData.stateName}. Compare ${schools.length} programs, read reviews, and choose the perfect swim school for your family.`}
 >
-	<!-- Hero Section -->
-	<div class="relative min-h-[500px] bg-gradient-to-br from-secondary/20 via-primary/10 to-accent/20 flex items-center">
-		<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSJyZ2JhKDAsIDE1MCwgMjAwLCAwLjA1KSIvPjwvZz48L3N2Zz4=')] opacity-50"></div>
+	<!-- Schema Markup for SEO -->
+	<SchemaMarkup
+		type="breadcrumb"
+		slot="head"
+		breadcrumbs={[
+			{ name: 'Home', url: '/' },
+			{ name: cityData.stateName, url: `/${cityData.stateSlug}` },
+			{ name: cityData.cityName, url: `/${cityData.stateSlug}/${cityData.citySlug}` }
+		]}
+	/>
 
-		<Section class="relative z-10 py-20">
+	<!-- Hero Image Section -->
+	<div class="relative h-[500px] overflow-hidden">
+		<!-- Background Image -->
+		<div class="absolute inset-0">
+			<img
+				src="https://images.unsplash.com/photo-1566024287286-457247b70310?auto=format&fit=crop&w=1920&q=80"
+				alt="Children swimming lessons"
+				class="w-full h-full object-cover"
+				loading="eager"
+			/>
+		</div>
+		<!-- Dark gradient overlay -->
+		<div class="absolute inset-0 bg-gradient-to-b from-foreground/60 via-foreground/50 to-background"></div>
+
+		<!-- Content overlay on image -->
+		<Section class="relative z-10 h-full flex items-center">
 			<div class="max-w-5xl">
 				<!-- Breadcrumb -->
 				<nav class="mb-8 text-sm">
 					<ol class="flex items-center gap-2 flex-wrap">
-						<li><a href="/" class="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
-						<li class="text-muted-foreground">/</li>
-						<li><a href={`/${cityData.stateSlug}`} class="text-muted-foreground hover:text-primary transition-colors">{cityData.stateName}</a></li>
-						<li class="text-muted-foreground">/</li>
-						<li class="text-foreground font-medium">{cityData.cityName}</li>
+						<li><a href="/" class="text-white/90 hover:text-white transition-colors drop-shadow-md">Home</a></li>
+						<li class="text-white/70">/</li>
+						<li><a href={`/${cityData.stateSlug}`} class="text-white/90 hover:text-white transition-colors drop-shadow-md">{cityData.stateName}</a></li>
+						<li class="text-white/70">/</li>
+						<li class="text-white font-medium drop-shadow-md">{cityData.cityName}</li>
 					</ol>
 				</nav>
 
-				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
-					Best Swim Lessons in <span class="text-primary">{cityData.cityName}</span>
+				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight drop-shadow-lg">
+					Best Swim Lessons in <span class="text-secondary">{cityData.cityName}</span>
 				</h1>
 
-				<p class="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-3xl">
+				<p class="text-xl md:text-2xl text-white/95 mb-8 leading-relaxed max-w-3xl drop-shadow-md">
 					Compare {schools.length} top-rated swim {schools.length === 1 ? 'program' : 'programs'} and find the perfect fit for your family
 				</p>
 
@@ -149,7 +172,7 @@ const availableSpecialties = Array.from(allCategories)
 							href={`/${specialty.slug}/${cityData.stateSlug}/${cityData.citySlug}`}
 							class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors text-sm font-medium"
 						>
-							<span class="text-xl">{specialty.icon}</span>
+							<img src={specialty.icon} alt={specialty.name} class="w-6 h-6 object-contain" />
 							<span>{specialty.name}</span>
 						</a>
 					))}
@@ -167,9 +190,6 @@ const availableSpecialties = Array.from(allCategories)
 				<Card class="hover:shadow-xl transition-shadow">
 					<CardHeader>
 						<div class="flex items-start justify-between mb-3">
-							<div class="text-4xl">
-								{school.specialFeatures.includes('On-Site Childcare') ? '👨‍👩‍👧' : '🏊‍♀️'}
-							</div>
 							{school.rating > 0 && (
 								<Badge variant="secondary" class="text-xs">
 									⭐ {school.rating.toFixed(1)}

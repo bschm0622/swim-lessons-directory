@@ -28,6 +28,7 @@ const { title, description, image, canonicalURL } = Astro.props;
             image={image}
             canonicalURL={canonicalURL}
         />
+        <slot name="head" />
     </head>
     <body class="bg-background text-foreground transition-colors flex flex-col min-h-screen">
         <Navbar />

@@ -17,11 +17,11 @@ const currentYear = new Date().getFullYear();
                 </p>
             </div>
 
-            <!-- Quick Links -->
+            <!-- Swim Lesson Types -->
             <div>
-                <h3 class="text-lg font-semibold mb-4 text-foreground">Quick Links</h3>
+                <h3 class="text-lg font-semibold mb-4 text-foreground">Swim Lesson Types</h3>
                 <nav class="flex flex-col gap-2">
-                    {SITE.nav.map((link) => (
+                    {SITE.footerNav?.map((link) => (
                         <NavigationMenuLink href={link.href} class="text-muted-foreground hover:text-foreground transition-colors text-sm w-fit">
                             {link.label}
                         </NavigationMenuLink>
@@ -29,12 +29,20 @@ const currentYear = new Date().getFullYear();
                 </nav>
             </div>
 
-            <!-- Social Links -->
+            <!-- Resources -->
             <div>
-                <h3 class="text-lg font-semibold mb-4 text-foreground">Connect</h3>
-                <p class="text-muted-foreground text-sm">
-                    Built with <a href="https://astro.build" class="text-primary hover:underline" target="_blank" rel="noopener">Astro</a> and <a href="https://tailwindcss.com" class="text-primary hover:underline" target="_blank" rel="noopener">Tailwind CSS</a>
-                </p>
+                <h3 class="text-lg font-semibold mb-4 text-foreground">Resources</h3>
+                <nav class="flex flex-col gap-2">
+                    <NavigationMenuLink href="/about" class="text-muted-foreground hover:text-foreground transition-colors text-sm w-fit">
+                        About Us
+                    </NavigationMenuLink>
+                    <NavigationMenuLink href="/browse" class="text-muted-foreground hover:text-foreground transition-colors text-sm w-fit">
+                        Browse All Programs
+                    </NavigationMenuLink>
+                    <NavigationMenuLink href="/" class="text-muted-foreground hover:text-foreground transition-colors text-sm w-fit">
+                        Find Lessons Near You
+                    </NavigationMenuLink>
+                </nav>
             </div>
         </div>
 

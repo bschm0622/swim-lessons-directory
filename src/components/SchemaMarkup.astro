@@ -1,0 +1,150 @@
+---
+import { SITE } from "../siteConfig";
+
+interface Props {
+  type: 'organization' | 'local-business' | 'breadcrumb' | 'service' | 'website-search';
+  // For local business schema
+  business?: {
+    name: string;
+    description: string;
+    address: string;
+    phone: string;
+    website?: string;
+    rating?: number;
+    coordinates?: { lat: number; lng: number };
+    categories?: string[];
+    priceTier?: string;
+    hours?: string;
+  };
+  // For breadcrumb schema
+  breadcrumbs?: Array<{ name: string; url: string }>;
+  // For service schema
+  service?: {
+    name: string;
+    description: string;
+    serviceType: string;
+  };
+}
+
+const { type, business, breadcrumbs, service } = Astro.props;
+
+let schema: any = {};
+
+// Organization Schema (for homepage)
+if (type === 'organization') {
+  schema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": SITE.name,
+    "url": SITE.href,
+    "description": SITE.description,
+    "logo": `${SITE.href}/logo.svg`,
+    "sameAs": Object.values(SITE.socials || {}).filter(Boolean),
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": SITE.socials?.email || "",
+      "contactType": "customer service"
+    }
+  };
+}
+
+// LocalBusiness Schema (for individual school pages)
+if (type === 'local-business' && business) {
+  const priceRange = business.priceTier || "$$";
+
+  schema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": business.name,
+    "description": business.description,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": business.address
+    },
+    "telephone": business.phone,
+    "url": business.website || "",
+    "priceRange": priceRange,
+  };
+
+  // Add rating if available
+  if (business.rating) {
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": business.rating,
+      "bestRating": "5",
+      "worstRating": "1"
+    };
+  }
+
+  // Add coordinates if available
+  if (business.coordinates) {
+    schema.geo = {
+      "@type": "GeoCoordinates",
+      "latitude": business.coordinates.lat,
+      "longitude": business.coordinates.lng
+    };
+  }
+
+  // Add opening hours if available (though most say "Call for hours")
+  if (business.hours && !business.hours.toLowerCase().includes('call')) {
+    schema.openingHours = business.hours;
+  }
+}
+
+// BreadcrumbList Schema (for nested pages)
+if (type === 'breadcrumb' && breadcrumbs && breadcrumbs.length > 0) {
+  schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": crumb.name,
+      "item": `${SITE.href}${crumb.url}`
+    }))
+  };
+}
+
+// Service Schema (for specialty category pages)
+if (type === 'service' && service) {
+  schema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": service.name,
+    "description": service.description,
+    "serviceType": service.serviceType,
+    "provider": {
+      "@type": "Organization",
+      "name": SITE.name,
+      "url": SITE.href
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "United States"
+    }
+  };
+}
+
+// WebSite with SearchAction Schema (for homepage)
+if (type === 'website-search') {
+  schema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": SITE.name,
+    "url": SITE.href,
+    "description": SITE.description,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${SITE.href}/search?q={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    }
+  };
+}
+---
+
+{Object.keys(schema).length > 0 && (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+)}

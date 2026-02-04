@@ -115,6 +115,19 @@ const shouldLoadAnalytics =
 
 {
     shouldLoadAnalytics && (
-        <script>// Replace with analytics script if needed</script>
+        <>
+            <!-- Google Analytics 4 (GA4) -->
+            <!-- Replace 'G-XXXXXXXXXX' with your actual GA4 Measurement ID -->
+            <!-- To get your ID: https://analytics.google.com/ > Admin > Data Streams -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX" is:inline></script>
+            <script is:inline>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-XXXXXXXXXX', {
+                    page_path: window.location.pathname,
+                });
+            </script>
+        </>
     )
 }

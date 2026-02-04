@@ -1,0 +1,199 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Section from "@/components/ui/Section.astro";
+import Button from "@/components/ui/Button.astro";
+import Card from "@/components/ui/Card.astro";
+import CardHeader from "@/components/ui/CardHeader.astro";
+import CardTitle from "@/components/ui/CardTitle.astro";
+import CardContent from "@/components/ui/CardContent.astro";
+import { SITE } from "@/siteConfig";
+---
+
+<Layout
+	title="About Us - Swim Lessons Directory"
+	description="Learn about Swim Lessons Directory, our mission to help families find safe, quality swim programs, and how we curate our listings."
+>
+	<!-- Hero Section -->
+	<div class="relative min-h-[400px] bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 flex items-center">
+		<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSJyZ2JhKDAsIDE1MCwgMjAwLCAwLjA1KSIvPjwvZz48L3N2Zz4=')] opacity-50"></div>
+
+		<Section class="relative z-10 py-20">
+			<div class="max-w-4xl">
+				<!-- Breadcrumb -->
+				<nav class="mb-8 text-sm">
+					<ol class="flex items-center gap-2">
+						<li><a href="/" class="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
+						<li class="text-muted-foreground">/</li>
+						<li class="text-foreground font-medium">About</li>
+					</ol>
+				</nav>
+
+				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
+					About <span class="text-primary">Swim Lessons Directory</span>
+				</h1>
+
+				<p class="text-xl md:text-2xl text-muted-foreground leading-relaxed">
+					Helping families discover safe, quality swim programs that build confidence and save lives
+				</p>
+			</div>
+		</Section>
+	</div>
+
+	<!-- Our Mission Section -->
+	<Section class="py-16 bg-background">
+		<div class="max-w-4xl mx-auto">
+			<h2 class="text-3xl md:text-4xl font-bold mb-6 text-foreground">Our Mission</h2>
+			<div class="prose prose-lg max-w-none text-muted-foreground">
+				<p class="text-lg leading-relaxed mb-4">
+					Water safety is one of the most important skills children can learn. Yet finding the right swim program
+					can be overwhelming for parents navigating different teaching methods, age groups, and specializations.
+				</p>
+				<p class="text-lg leading-relaxed mb-4">
+					That's why we created Swim Lessons Directory—a comprehensive resource that helps families discover and
+					compare swim programs tailored to their unique needs. Whether you're looking for infant water safety classes,
+					competitive swim training, adaptive lessons for special needs, or anything in between, we make it easy to
+					find the perfect fit.
+				</p>
+				<p class="text-lg leading-relaxed">
+					Our goal is simple: connect every child with quality swim instruction that builds confidence,
+					teaches essential safety skills, and fosters a lifelong love of the water.
+				</p>
+			</div>
+		</div>
+	</Section>
+
+	<!-- How We Work Section -->
+	<Section class="py-16 bg-muted/30">
+		<div class="max-w-4xl mx-auto">
+			<h2 class="text-3xl md:text-4xl font-bold mb-12 text-foreground text-center">How We Work</h2>
+
+			<div class="grid md:grid-cols-3 gap-8">
+				<Card class="text-center">
+					<CardHeader>
+						<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
+								<path d="M3 3h18v18H3z"></path>
+								<path d="M21 9H3"></path>
+								<path d="M21 15H3"></path>
+								<path d="M12 3v18"></path>
+							</svg>
+						</div>
+						<CardTitle class="text-xl">Curated Listings</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<p class="text-muted-foreground">
+							We research and verify swim schools, YMCAs, community centers, and private instructors to ensure quality standards.
+						</p>
+					</CardContent>
+				</Card>
+
+				<Card class="text-center">
+					<CardHeader>
+						<div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-accent">
+								<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+							</svg>
+						</div>
+						<CardTitle class="text-xl">Detailed Information</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<p class="text-muted-foreground">
+							Each listing includes program details, pricing, specialties, contact info, and ratings to help you make informed decisions.
+						</p>
+					</CardContent>
+				</Card>
+
+				<Card class="text-center">
+					<CardHeader>
+						<div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-secondary">
+								<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+								<circle cx="12" cy="10" r="3"></circle>
+							</svg>
+						</div>
+						<CardTitle class="text-xl">Local Focus</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<p class="text-muted-foreground">
+							Browse by location to find programs in your neighborhood, with detailed filters for specialty types and age groups.
+						</p>
+					</CardContent>
+				</Card>
+			</div>
+		</div>
+	</Section>
+
+	<!-- What We Specialize In Section -->
+	<Section class="py-16 bg-background">
+		<div class="max-w-4xl mx-auto">
+			<h2 class="text-3xl md:text-4xl font-bold mb-8 text-foreground">What We Specialize In</h2>
+
+			<div class="space-y-6">
+				<div class="border-l-4 border-primary pl-6">
+					<h3 class="text-xl font-semibold mb-2 text-foreground">Private & Semi-Private Lessons</h3>
+					<p class="text-muted-foreground">One-on-one instruction for accelerated learning and personalized attention.</p>
+				</div>
+
+				<div class="border-l-4 border-secondary pl-6">
+					<h3 class="text-xl font-semibold mb-2 text-foreground">Parent & Child Classes</h3>
+					<p class="text-muted-foreground">Early water introduction for infants and toddlers with parent participation.</p>
+				</div>
+
+				<div class="border-l-4 border-accent pl-6">
+					<h3 class="text-xl font-semibold mb-2 text-foreground">Adaptive & Special Needs Programs</h3>
+					<p class="text-muted-foreground">Specialized instruction for children with physical, developmental, or sensory needs.</p>
+				</div>
+
+				<div class="border-l-4 border-primary pl-6">
+					<h3 class="text-xl font-semibold mb-2 text-foreground">Competitive Swim Training</h3>
+					<p class="text-muted-foreground">Stroke development, technique refinement, and team training for aspiring swimmers.</p>
+				</div>
+
+				<div class="border-l-4 border-secondary pl-6">
+					<h3 class="text-xl font-semibold mb-2 text-foreground">Survival-First & Water Safety</h3>
+					<p class="text-muted-foreground">Critical drowning prevention skills and self-rescue techniques.</p>
+				</div>
+
+				<div class="border-l-4 border-accent pl-6">
+					<h3 class="text-xl font-semibold mb-2 text-foreground">Adult & Teen Lessons</h3>
+					<p class="text-muted-foreground">Never too late to learn—supportive instruction for teens and adults of all levels.</p>
+				</div>
+
+				<div class="border-l-4 border-primary pl-6">
+					<h3 class="text-xl font-semibold mb-2 text-foreground">At-Home & Mobile Instruction</h3>
+					<p class="text-muted-foreground">Convenience of private lessons at your own pool with certified instructors.</p>
+				</div>
+			</div>
+		</div>
+	</Section>
+
+	<!-- Contact Section -->
+	<Section class="py-16 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
+		<div class="max-w-3xl mx-auto text-center">
+			<h2 class="text-3xl md:text-4xl font-bold mb-6 text-foreground">Get in Touch</h2>
+			<p class="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+				Have questions about our directory? Want to add your swim program to our listings?
+				We'd love to hear from you.
+			</p>
+
+			<div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+				{SITE.socials?.email && (
+					<Button size="lg" href={`mailto:${SITE.socials.email}`}>
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<rect width="20" height="16" x="2" y="4" rx="2"></rect>
+							<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+						</svg>
+						Contact Us
+					</Button>
+				)}
+				<Button size="lg" variant="outline" href="/browse">
+					Browse Programs
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M5 12h14"></path>
+						<path d="m12 5 7 7-7 7"></path>
+					</svg>
+				</Button>
+			</div>
+		</div>
+	</Section>
+</Layout>

@@ -551,7 +551,7 @@
     "name": "The British Swim School at Hancock Wellness Center - Greenfield",
     "placeId": "ChIJJQpkt8Mxa4gR-rxmcoxajAA",
     "website": "https://britishswimschool.com/central-indiana/location/hancock-wellness-center-greenfield/",
-    "summary": "Located within the premier **Hancock Wellness Center in Greenfield**, the British Swim School offers a specialized, \"survival-first\" aquatic program designed for the local community. This isn't your typical neighborhood pool experience; it is a goal-oriented program where safety and technical skill go hand-in-hand. The facility provides a calm, professional environment that is particularly well-suited for families who want a structured yet gentle approach to learning. Whether you are a parent looking to protect your infant or an adult finally ready to conquer your fear of the water, this location serves as a welcoming hub for all ages.\n\n### **Expert and Specialized Swimming Lessons**\nThe British Swim School curriculum is built on a \"Step-by-Step\" method, ensuring that every swimmer masters essential survival skills—like back floating and breath control—before moving on to competitive strokes. This location excels in providing specialized tracks for unique needs:\n\n*   **Infant and Toddler (3 Months – 3 Years):** Starting as early as three months, the \"Tadpole\" and \"Swimboree\" levels provide a gentle introduction. These classes emphasize water acclimation and survival skills with the support of a caregiver, building a foundation of safety from the very beginning.\n*   **Special Abilities (Dolphin Program):** The \"Dolphin\" level is specifically designed for students with special needs. These lessons focus on water safety and survival, adapted to the unique learning styles and physical abilities of the student.\n*   **Adult and Teen Lessons:** Specifically designed to be age-appropriate and encouraging, these tracks help older students build confidence and master the four competitive swim strokes at their own pace.\n*   **Private and Semi-Private:** For those who thrive with one-on-one attention or have very specific goals, private lessons are available upon request (subject to availability).\n\n#### **Monthly Tuition and Fee Overview**\n*Note: A $45 registration fee applies per family. Discounts are available for siblings and Hancock Wellness Center (HWC) members.*\n\n| Program Category | Frequency | Monthly Price | Average Per Lesson |\n| :--- | :--- | :--- | :--- |\n| **Youth (3mos – 17yrs)** | 1 Lesson / Week | $145 | ~$34 |\n| **Youth (3mos – 17yrs)** | 2 Lessons / Week | $260 | ~$30 |\n| **Adult (18+ yrs)** | 1 Lesson / Week | $240 | ~$55 |\n| **Private / Semi-Private** | Upon Request | Contact for Quote | Varies |\n\n### **Additional Facility Selling Points**\nThe Hancock Wellness Center provides a top-tier environment for learning. The **pool is comfortably heated**, which is crucial for keeping young children and infants focused rather than shivering. Families also appreciate the **private changing facilities**, ensuring a smooth and comfortable transition before and after lessons. A major selling point for this location is the small class size: survival classes maintain a **4:1 student-to-instructor ratio**, while stroke development classes stay at **6:1**. This ensures that your instructor can provide the individualized feedback necessary to help you or your child progress through the program’s clear, five-goal milestones. With year-round enrollment, you can dive into a safer swimming journey at any time.",
+    "summary": "Located within the premier **Hancock Wellness Center in Greenfield**, the British Swim School offers a specialized, \"survival-first\" aquatic program designed for the local community. This isn't your typical neighborhood pool experience; it is a goal-oriented program where safety and technical skill go hand-in-hand. The facility provides a calm, professional environment that is particularly well-suited for families who want a structured yet gentle approach to learning. Whether you are a parent looking to protect your infant or an adult finally ready to conquer your fear of the water, this location serves as a welcoming hub for all ages.\n\n### **Expert and Specialized Swimming Lessons**\nThe British Swim School curriculum is built on a \"Step-by-Step\" method, ensuring that every swimmer masters essential survival skills—like back floating and breath control—before moving on to competitive strokes. This location excels in providing specialized tracks for unique needs:\n\n*   **Infant and Toddler (3 Months – 3 Years):** Starting as early as three months, the \"Tadpole\" and \"Swimboree\" levels provide a gentle introduction. These classes emphasize water acclimation and survival skills with the support of a caregiver, building a foundation of safety from the very beginning.\n*   **Special Abilities (Dolphin Program):** The \"Dolphin\" level is specifically designed for students with special needs. These lessons focus on water safety and survival, adapted to the unique learning styles and physical abilities of the student.\n*   **Adult and Teen Lessons:** Specifically designed to be age-appropriate and encouraging, these tracks help older students build confidence and master the four competitive swim strokes at their own pace.\n*   **Private and Semi-Private:** For those who thrive with one-on-one attention or have very specific goals, private lessons are available upon request (subject to availability).\n\n#### **Monthly Tuition and Fee Overview**\n*Note: A $45 registration fee applies per family. Discounts are available for siblings and Hancock Wellness Center (HWC) members.*\n\n| Program Category | Frequency | Monthly Price | Average Per Lesson |\n| :--- | :--- | :--- | :--- |\n| **Youth (3mos – 17yrs)** | 1 Lesson / Week | $145 | ~$34 |\n| **Youth (3mos – 17yrs)** | 2 Lessons / Week | $260 | ~$30 |\n| **Adult (18+ yrs)** | 1 Lesson / Week | $240 | ~$55 |\n| **Private / Semi-Private** | Upon Request | Contact for Quote | Varies |\n\n### **Additional Facility Selling Points**\nThe Hancock Wellness Center provides a top-tier environment for learning. The **pool is comfortably heated**, which is crucial for keeping young children and infants focused rather than shivering. Families also appreciate the **private changing facilities**, ensuring a smooth and comfortable transition before and after lessons. A major selling point for this location is the small class size: survival classes maintain a **4:1 student-to-instructor ratio**, while stroke development classes stay at **6:1**. This ensures that your instructor can provide the individualized feedback necessary to help you or your child progress through the program's clear, five-goal milestones. With year-round enrollment, you can dive into a safer swimming journey at any time.",
     "address": "888 W New Rd, Greenfield, IN 46140, USA",
     "phone": "(317) 863-0300",
     "coordinates": {
@@ -570,7 +570,7 @@
     "priceTier": "$$",
     "facilityType": "Host Facility",
     "specialFeatures": [],
-    "shortDescription": "A survival-focused swim program located within LivRite Fitness, offering a goal-oriented curriculum for all ages and abilities from infants to adults.",
+    "shortDescription": "A survival-focused British Swim School program located within Hancock Wellness Center in Greenfield, offering structured curriculum for all ages from infants to adults with small class sizes.",
     "hours": "Call for hours"
   },
   {
@@ -831,11 +831,17 @@
       "lng": -97.8118375
     },
     "rating": 4.7,
-    "categories": [],
+    "categories": [
+      "Parent & Child",
+      "Adult & Teen",
+      "Private / Semi-Private",
+      "Competitive / Clinics",
+      "Adaptive / Special Needs"
+    ],
     "priceTier": "$$",
     "facilityType": "Community Center",
     "specialFeatures": [],
-    "shortDescription": "",
+    "shortDescription": "A premier 29,000-square-foot indoor aquatic center at Highway 183 and FM 620, featuring dual pools and offering year-round swim lessons from infants to competitive programs with small class ratios.",
     "hours": "Call for hours"
   },
   {
@@ -851,11 +857,17 @@
       "lng": -97.7414581
     },
     "rating": 4.9,
-    "categories": [],
+    "categories": [
+      "Parent & Child",
+      "Adult & Teen",
+      "Private / Semi-Private",
+      "Competitive / Clinics",
+      "Adaptive / Special Needs"
+    ],
     "priceTier": "$$",
     "facilityType": "Community Center",
     "specialFeatures": [],
-    "shortDescription": "",
+    "shortDescription": "A boutique 7,300-square-foot facility at Anderson Lane and Mopac, featuring two warm 88°F indoor pools and specializing in personalized swim instruction with small class ratios and free infant intro classes.",
     "hours": "Call for hours"
   },
   {
@@ -871,11 +883,17 @@
       "lng": -97.6506577
     },
     "rating": 4.7,
-    "categories": [],
+    "categories": [
+      "Parent & Child",
+      "Adult & Teen",
+      "Private / Semi-Private",
+      "Competitive / Clinics",
+      "Adaptive / Special Needs"
+    ],
     "priceTier": "$$",
     "facilityType": "Community Center",
     "specialFeatures": [],
-    "shortDescription": "",
+    "shortDescription": "A 23,000-square-foot indoor aquatic center featuring dual pools with comprehensive swim programming from free infant classes to competitive teams and adult fitness programs.",
     "hours": "Call for hours"
   },
   {
@@ -891,11 +909,16 @@
       "lng": -97.757676
     },
     "rating": 5,
-    "categories": [],
+    "categories": [
+      "Parent & Child",
+      "Adult & Teen",
+      "Private / Semi-Private",
+      "Adaptive / Special Needs"
+    ],
     "priceTier": "$$",
     "facilityType": "Community Center",
     "specialFeatures": [],
-    "shortDescription": "",
+    "shortDescription": "An inclusive Jewish Community Center offering comprehensive aquatic programs from infant water safety to Swim Angelfish certified adaptive lessons for swimmers with special needs in a welcoming community environment.",
     "hours": "Call for hours"
   },
   {
@@ -911,11 +934,15 @@
       "lng": -97.7335226
     },
     "rating": 4.4,
-    "categories": [],
+    "categories": [
+      "Adult & Teen",
+      "Private / Semi-Private",
+      "Adaptive / Special Needs"
+    ],
     "priceTier": "$$",
     "facilityType": "Community Center",
     "specialFeatures": [],
-    "shortDescription": "",
+    "shortDescription": "Campus aquatic facility at Gregory Gym offering personalized private swim instruction for UT students, faculty, staff, and community members of all skill levels in a world-class environment.",
     "hours": "Call for hours"
   },
   {
@@ -1110,7 +1137,7 @@
     "name": "Brushy Creek Community Center",
     "placeId": "ChIJewuVkWTSRIYR13Y_ZSkOMg0",
     "website": "https://www.bcmud.org/content/13130/13282/14637/14654.aspx",
-    "summary": "Located in the heart of Round Rock, the **Brushy Creek Municipal Utility District (BCMUD)** is a community-focused wellness hub known for its scenic parks and family-oriented atmosphere. The district maintains several beautiful pool locations, providing local residents and visitors with a clean, safe, and professional environment to master the water. Whether you’re a local neighbor or coming from across the greater Austin area, you’ll find a welcoming community center that prioritizes individualized progress and safety for all ages.\n\n### **Personalized & Specialized Swim Lessons**\nIf you’re looking for a program that adapts to your unique needs, Brushy Creek’s **Learn-to-Swim** private and semi-private lessons are an ideal choice. Unlike large group classes, these sessions offer the undivided attention of an instructor, making them perfect for students who need a customized pace.\n\nOn your first day, instructors perform a quick evaluation and discuss specific goals to ensure the curriculum is tailored to the swimmer’s current ability. A major selling point for this location is their commitment to inclusivity; they are happy to customize private lessons specifically for **students with physical disabilities or other special needs**, ensuring that every member of the community has the chance to become \"water safe.\" Lessons are available for everyone from infants to adults, focusing on everything from water acclimation to advanced stroke refinement.\n\n#### **Lesson Pricing & Registration Details**\n*Fees cover a package of (4) 30-minute lessons (2 hours of total instruction).*\n\n| Lesson Type | BCCC Member | BCMUD Resident | Non-Resident |\n| :--- | :--- | :--- | :--- |\n| **Private (1:1)** | $200 | $220 | $260 |\n| **Semi-Private (2:1)** | $160 | $180 | $220 |\n\n**Note for Semi-Private Lessons:** To register, first enroll in a private lesson to secure your time slot, then contact the Head Swim Instructor to modify the booking to a semi-private session for two children.\n\n### **More Than Just a Pool**\nBeyond the water, Brushy Creek is a full-service recreation destination. The area features a sprawling **Community Center**, extensive walking trails, and several themed parks. Once you’ve finished your swim lesson, families can take advantage of the local gym, youth sports leagues, and community events that happen throughout the year. It’s a great place to spend the day, combining high-quality instruction with a true \"neighborhood\" feel.",
+    "summary": "Located in the heart of Round Rock, the **Brushy Creek Municipal Utility District (BCMUD)** is a community-focused wellness hub known for its scenic parks and family-oriented atmosphere. The district maintains several beautiful pool locations, providing local residents and visitors with a clean, safe, and professional environment to master the water. Whether you're a local neighbor or coming from across the greater Austin area, you'll find a welcoming community center that prioritizes individualized progress and safety for all ages.\n\n### **Personalized & Specialized Swim Lessons**\nIf you're looking for a program that adapts to your unique needs, Brushy Creek's **Learn-to-Swim** private and semi-private lessons are an ideal choice. Unlike large group classes, these sessions offer the undivided attention of an instructor, making them perfect for students who need a customized pace.\n\nOn your first day, instructors perform a quick evaluation and discuss specific goals to ensure the curriculum is tailored to the swimmer's current ability. A major selling point for this location is their commitment to inclusivity; they are happy to customize private lessons specifically for **students with physical disabilities or other special needs**, ensuring that every member of the community has the chance to become \"water safe.\" Lessons are available for everyone from infants to adults, focusing on everything from water acclimation to advanced stroke refinement.\n\n#### **Lesson Pricing & Registration Details**\n*Fees cover a package of (4) 30-minute lessons (2 hours of total instruction).*\n\n| Lesson Type | BCCC Member | BCMUD Resident | Non-Resident |\n| :--- | :--- | :--- | :--- |\n| **Private (1:1)** | $200 | $220 | $260 |\n| **Semi-Private (2:1)** | $160 | $180 | $220 |\n\n**Note for Semi-Private Lessons:** To register, first enroll in a private lesson to secure your time slot, then contact the Head Swim Instructor to modify the booking to a semi-private session for two children.\n\n### **More Than Just a Pool**\nBeyond the water, Brushy Creek is a full-service recreation destination. The area features a sprawling **Community Center**, extensive walking trails, and several themed parks. Once you've finished your swim lesson, families can take advantage of the local gym, youth sports leagues, and community events that happen throughout the year. It's a great place to spend the day, combining high-quality instruction with a true \"neighborhood\" feel.",
     "address": "16318 Great Oaks Dr, Round Rock, TX 78681, USA",
     "phone": "(512) 255-7871",
     "coordinates": {
@@ -1120,18 +1147,16 @@
     "rating": 4.5,
     "categories": [
       "Parent & Child",
-      "Survival-First",
       "Adult & Teen",
       "Private / Semi-Private",
-      "Competitive / Clinics",
-      "Mobile / At-Home"
+      "Adaptive / Special Needs"
     ],
     "priceTier": "$$",
-    "facilityType": "Mobile Service",
+    "facilityType": "Community Recreation Center",
     "specialFeatures": [
       "Not Specified"
     ],
-    "shortDescription": "Joy Swim School offers mobile private and small-group swimming instruction for all ages across Austin and Waco, focusing on rapid water safety and advanced stroke technique through convenient weekly intensives.",
+    "shortDescription": "Community-focused recreation center in Round Rock offering private and semi-private swim lessons for all ages, with specialized programs for students with disabilities and accessible pricing for residents.",
     "hours": "Call for hours"
   },
   {

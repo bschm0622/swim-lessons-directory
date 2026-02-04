@@ -128,7 +128,9 @@ const uniqueCategories = Array.from(allCategoriesInCity);
 				</nav>
 
 				<!-- Icon -->
-				<div class="text-5xl mb-4">{specialty.icon}</div>
+				<div class="mb-4">
+					<img src={specialty.icon} alt={specialty.name} class="w-20 h-20 object-contain" />
+				</div>
 
 				<!-- H1 -->
 				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
@@ -158,22 +160,50 @@ const uniqueCategories = Array.from(allCategoriesInCity);
 		</Section>
 	</div>
 
-	<!-- Quick Benefits Bar -->
-	<div class="bg-muted/30 py-8">
-		<Section>
-			<div class="flex flex-wrap gap-4 justify-center text-sm max-w-4xl mx-auto">
-				{specialty.benefits.slice(0, 3).map(benefit => (
-					<span class="flex items-center gap-2 bg-card px-4 py-2 rounded-full border border-border/50">
-						<span class="text-primary text-lg">✓</span>
-						<span class="font-medium">{benefit}</span>
-					</span>
-				))}
+	<!-- About This Specialty -->
+	<Section class="py-16 bg-muted/20">
+		<div class="max-w-4xl mx-auto">
+			<h2 class="text-3xl font-bold mb-6">About {specialty.seoTitle} in {cityName}, {stateAbbrev}</h2>
+			<div class="prose prose-lg max-w-none">
+				<p class="text-muted-foreground leading-relaxed mb-8">
+					{specialty.longDescription}
+				</p>
 			</div>
-		</Section>
-	</div>
+
+			<!-- Two Column Layout: Benefits + Target Audience -->
+			<div class="grid md:grid-cols-2 gap-8 mt-10">
+				<!-- Benefits -->
+				<div>
+					<h3 class="text-xl font-bold mb-4">What You'll Get</h3>
+					<div class="space-y-3">
+						{specialty.benefits.map(benefit => (
+							<div class="flex items-start gap-2">
+								<div class="text-primary mt-1 flex-shrink-0">
+									<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polyline points="20 6 9 17 4 12"></polyline>
+									</svg>
+								</div>
+								<span class="text-sm text-foreground">{benefit}</span>
+							</div>
+						))}
+					</div>
+				</div>
+
+				<!-- Target Audience -->
+				<div>
+					<h3 class="text-xl font-bold mb-4">Perfect For</h3>
+					<div class="bg-muted/50 border border-border/50 rounded-lg p-5">
+						<p class="text-sm text-muted-foreground leading-relaxed">
+							{specialty.targetAudience}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</Section>
 
 	<!-- All Schools Grid -->
-	<Section class="py-16 bg-background">
+	<Section class="py-16 bg-background border-t border-border/30">
 		<h2 class="text-3xl font-bold mb-8">All {specialty.seoTitle} Programs in {cityName}</h2>
 
 		<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -181,9 +211,6 @@ const uniqueCategories = Array.from(allCategoriesInCity);
 				<Card class="hover:shadow-xl transition-shadow h-full flex flex-col">
 					<CardHeader>
 						<div class="flex items-start justify-between mb-3">
-							<div class="text-4xl">
-								{school.specialFeatures.includes('On-Site Childcare') ? '👨‍👩‍👧' : '🏊‍♀️'}
-							</div>
 							{school.rating > 0 && (
 								<Badge variant="secondary" class="text-xs">
 									⭐ {school.rating.toFixed(1)}
@@ -276,7 +303,9 @@ const uniqueCategories = Array.from(allCategoriesInCity);
 							href={`/${relatedSpecialty.slug}/${stateSlug}/${citySlug}`}
 							class={`${relatedSpecialty.color} rounded-xl p-6 text-center hover:scale-105 transition-transform border border-border/50 hover:border-primary/30 hover:shadow-md block`}
 						>
-							<div class="text-4xl mb-3">{relatedSpecialty.icon}</div>
+							<div class="flex justify-center mb-3">
+								<img src={relatedSpecialty.icon} alt={relatedSpecialty.name} class="w-16 h-16 object-contain" />
+							</div>
 							<div class="font-medium text-sm text-foreground">{relatedSpecialty.name}</div>
 						</a>
 					))}
