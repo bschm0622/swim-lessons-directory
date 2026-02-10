@@ -102,131 +102,101 @@ const availableSpecialties = Array.from(allCategories)
 		]}
 	/>
 
-	<!-- Hero Image Section -->
-	<div class="relative h-[500px] overflow-hidden">
-		<!-- Background Image -->
-		<div class="absolute inset-0">
-			<img
-				src="https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=1920&q=80"
-				alt="Swimming lessons"
-				class="w-full h-full object-cover"
-				loading="eager"
-			/>
-		</div>
-		<!-- Dark gradient overlay -->
-		<div class="absolute inset-0 bg-gradient-to-b from-foreground/60 via-foreground/50 to-background"></div>
+	<!-- Compact Header -->
+	<div class="border-b border-border bg-background">
+		<Section class="py-6">
+			<!-- Breadcrumb -->
+			<nav class="mb-4 text-sm">
+				<ol class="flex items-center gap-2">
+					<li><a href="/" class="text-muted-foreground hover:text-primary">Home</a></li>
+					<li class="text-muted-foreground">/</li>
+					<li class="text-foreground font-medium">{state.name}</li>
+				</ol>
+			</nav>
 
-		<!-- Content overlay on image -->
-		<Section class="relative z-10 h-full flex items-center">
-			<div class="max-w-4xl">
-				<!-- Breadcrumb -->
-				<nav class="mb-8 text-sm">
-					<ol class="flex items-center gap-2">
-						<li><a href="/" class="text-white/90 hover:text-white transition-colors drop-shadow-md">Home</a></li>
-						<li class="text-white/70">/</li>
-						<li class="text-white font-medium drop-shadow-md">{state.name}</li>
-					</ol>
-				</nav>
+			<h1 class="text-3xl md:text-4xl font-bold mb-2 text-foreground">
+				Swim Lessons in {state.name}
+			</h1>
 
-				<h1 class="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight drop-shadow-lg">
-					Swim Lessons in <span class="text-secondary">{state.name}</span>
-				</h1>
+			<p class="text-base text-muted-foreground mb-4">
+				{state.schools.length} programs across {cities.length} {cities.length === 1 ? 'city' : 'cities'} • {state.schools.filter(s => s.rating >= 4.5).length} top-rated
+			</p>
 
-				<p class="text-xl md:text-2xl text-white/95 mb-8 leading-relaxed drop-shadow-md">
-					Discover {state.schools.length} top-rated swim programs across {cities.length} {cities.length === 1 ? 'city' : 'cities'}
-				</p>
-
-				<!-- Stats -->
-				<div class="flex flex-wrap gap-4">
-					<div class="bg-card/80 backdrop-blur-sm border-2 border-primary/20 rounded-xl px-6 py-4 hover:border-primary/40 transition-colors">
-						<div class="text-3xl font-bold text-primary">{state.schools.length}</div>
-						<div class="text-sm text-muted-foreground font-medium">Programs</div>
-					</div>
-					<div class="bg-card/80 backdrop-blur-sm border-2 border-primary/20 rounded-xl px-6 py-4 hover:border-primary/40 transition-colors">
-						<div class="text-3xl font-bold text-primary">{cities.length}</div>
-						<div class="text-sm text-muted-foreground font-medium">{cities.length === 1 ? 'City' : 'Cities'}</div>
-					</div>
-					<div class="bg-card/80 backdrop-blur-sm border-2 border-secondary/20 rounded-xl px-6 py-4 hover:border-secondary/40 transition-colors">
-						<div class="text-3xl font-bold text-secondary">
-							{state.schools.filter(s => s.rating >= 4.5).length}
-						</div>
-						<div class="text-sm text-muted-foreground font-medium">Top Rated (4.5+)</div>
+			<!-- Specialty Filters -->
+			{availableSpecialties.length > 1 && (
+				<div class="mt-4">
+					<p class="text-sm font-semibold text-muted-foreground mb-2">Filter by specialty:</p>
+					<div class="flex flex-wrap gap-2">
+						{availableSpecialties.map(specialty => (
+							<a
+								href={`/${specialty.slug}/${state.slug}`}
+								class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-card border border-border hover:border-primary text-xs"
+							>
+								<img src={specialty.icon} alt={specialty.name} class="w-4 h-4 object-contain" />
+								<span>{specialty.name}</span>
+							</a>
+						))}
 					</div>
 				</div>
-			</div>
+			)}
 		</Section>
 	</div>
 
-	<!-- Filter by Specialty Section -->
-	{availableSpecialties.length > 1 && (
-		<Section class="py-12 bg-muted/20 border-b border-border/50">
-			<div class="max-w-5xl mx-auto">
-				<h2 class="text-xl font-semibold mb-4 text-center">Filter by Specialty</h2>
-				<div class="flex flex-wrap gap-3 justify-center">
-					{availableSpecialties.map(specialty => (
-						<a
-							href={`/${specialty.slug}/${state.slug}`}
-							class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors text-sm font-medium"
-						>
-							<img src={specialty.icon} alt={specialty.name} class="w-6 h-6 object-contain" />
-							<span>{specialty.name}</span>
-						</a>
-					))}
-				</div>
-			</div>
-		</Section>
-	)}
-
 	<!-- Cities Section -->
-	<Section class="py-16 bg-background">
-		<h2 class="text-3xl font-bold mb-8">Browse by City</h2>
+	<Section class="py-8 bg-background">
+		<h2 class="text-2xl font-bold mb-6">Top Programs by City</h2>
 
-		<div class="space-y-12">
+		<div class="space-y-10">
 			{cities.map(city => (
 				<div>
-					<div class="flex items-center justify-between mb-6">
+					<div class="flex items-center justify-between mb-4">
 						<div>
-							<h3 class="text-2xl font-bold text-foreground">{city.name}</h3>
-							<p class="text-muted-foreground">{city.schools.length} {city.schools.length === 1 ? 'program' : 'programs'}</p>
+							<h3 class="text-xl font-bold text-foreground">{city.name}</h3>
+							<p class="text-sm text-muted-foreground">{city.schools.length} {city.schools.length === 1 ? 'program' : 'programs'}</p>
 						</div>
-						<Button variant="outline" href={`/${state.slug}/${city.slug}`}>
-							View All in {city.name}
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<path d="M5 12h14"></path>
-								<path d="m12 5 7 7-7 7"></path>
-							</svg>
+						<Button variant="outline" size="sm" href={`/${state.slug}/${city.slug}`}>
+							View all →
 						</Button>
 					</div>
 
-					<div class="grid md:grid-cols-3 gap-6">
+					<div class="grid md:grid-cols-3 gap-5">
 						{city.topRated.map(school => (
-							<Card class="hover:shadow-lg transition-shadow">
-								<CardHeader>
-									<div class="flex items-start justify-between mb-2">
-											{school.rating > 0 && (
-											<Badge variant="secondary" class="text-xs">
+							<Card class="hover:shadow-md h-full flex flex-col">
+								<CardHeader class="pb-3">
+									<div class="flex items-start justify-between gap-3 mb-2">
+										<CardTitle class="text-lg leading-tight">
+											<a href={`/${state.slug}/${city.slug}/${school.id}`} class="hover:text-primary">
+												{school.name}
+											</a>
+										</CardTitle>
+										{school.rating > 0 && (
+											<Badge variant="secondary" class="text-xs flex-shrink-0">
 												⭐ {school.rating.toFixed(1)}
 											</Badge>
 										)}
 									</div>
-									<CardTitle>
-										<a href={`/${state.slug}/${city.slug}/${school.id}`} class="hover:text-primary transition-colors">
-											{school.name}
-										</a>
-									</CardTitle>
-									<CardDescription class="mt-2">
+								</CardHeader>
+
+								<CardContent class="flex-grow flex flex-col pt-0">
+									<p class="text-sm text-muted-foreground mb-3 line-clamp-2">
+										{school.shortDescription}
+									</p>
+
+									<!-- Categories -->
+									<div class="flex flex-wrap gap-1 mb-3 mt-auto">
 										{school.categories.slice(0, 2).map(cat => (
-											<Badge variant="outline" class="text-xs mr-1 mb-1">
+											<Badge variant="outline" class="text-xs">
 												{cat}
 											</Badge>
 										))}
-									</CardDescription>
-								</CardHeader>
-								<CardContent>
-									<p class="text-sm text-muted-foreground line-clamp-2 mb-3">
-										{school.shortDescription}
-									</p>
-									<Button variant="outline" href={`/${state.slug}/${city.slug}/${school.id}`} class="w-full">
+										{school.categories.length > 2 && (
+											<Badge variant="outline" class="text-xs">
+												+{school.categories.length - 2}
+											</Badge>
+										)}
+									</div>
+
+									<Button variant="outline" href={`/${state.slug}/${city.slug}/${school.id}`} size="sm" class="w-full">
 										View Details
 									</Button>
 								</CardContent>
@@ -235,12 +205,12 @@ const availableSpecialties = Array.from(allCategories)
 					</div>
 
 					{city.schools.length > 3 && (
-						<div class="mt-4 text-center">
+						<div class="mt-3">
 							<a
 								href={`/${state.slug}/${city.slug}`}
-								class="text-primary hover:underline text-sm font-medium"
+								class="text-sm text-primary hover:underline"
 							>
-								+ {city.schools.length - 3} more in {city.name}
+								+ {city.schools.length - 3} more programs in {city.name}
 							</a>
 						</div>
 					)}

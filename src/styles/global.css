@@ -200,16 +200,7 @@
     --shadow-2xl: var(--shadow-2xl);
 }
 
-/* Smooth theme transitions */
-*,
-*::before,
-*::after {
-    transition: background-color 0.2s ease-in-out,
-                border-color 0.2s ease-in-out,
-                color 0.2s ease-in-out,
-                fill 0.2s ease-in-out,
-                stroke 0.2s ease-in-out;
-}
+/* Minimal transitions - only on interactive elements via Tailwind */
 
 .typography {
   @apply text-[1.05rem] leading-7 text-foreground;
